@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/api'
 import toast from 'react-hot-toast'
+import ecoleImage from '../../assets/ecole.jpg'
 
-// ── Styles (mêmes animations que Home.jsx) ────────────────────
 const CONTACT_STYLES = `
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(22px); }
@@ -28,28 +28,22 @@ const CONTACT_STYLES = `
   .cfade-4 { animation-delay: 0.35s; }
 `
 
-// ── Palette 100% identique à Home.jsx ────────────────────────
-const GREEN_MAIN  = '#1B7A3E'
-const GREEN_DARK  = '#0f4a25'
-const GREEN_CTA   = 'linear-gradient(135deg, #0f4a25, #1B7A3E)'
-const GREEN_HOV   = 'linear-gradient(135deg, #0a2e18, #0f4a25)'
-const ORANGE      = '#F5A623'
-const TEXT_MUTED  = 'rgba(255,255,255,0.65)'
-const TEXT_DIM    = 'rgba(255,255,255,0.42)'
-const BORDER_DIM  = 'rgba(255,255,255,0.1)'
-const GRID_LINES  = 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)'
+const GREEN_MAIN = '#1B7A3E'
+const GREEN_DARK = '#0f4a25'
+const GREEN_CTA  = 'linear-gradient(135deg, #0f4a25, #1B7A3E)'
+const GREEN_HOV  = 'linear-gradient(135deg, #0a2e18, #0f4a25)'
+const ORANGE     = '#F5A623'
+const TEXT_MUTED = 'rgba(255,255,255,0.65)'
+const BORDER_DIM = 'rgba(255,255,255,0.1)'
+const GRID_LINES = 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)'
 
-// ── Carte info — même ligne (titre | valeur) ──────────────────
 function InfoCard({ icon: Icon, titre, valeur, accent, delay }) {
   return (
     <Box
       className={`cfade ${delay}`}
       sx={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 2,
-        px: 2.5, py: 1.75,
-        borderRadius: '12px',
+        display: 'flex', alignItems: 'center', gap: 2,
+        px: 2.5, py: 1.75, borderRadius: '12px',
         background: 'rgba(255,255,255,0.055)',
         border: `1px solid ${BORDER_DIM}`,
         transition: 'all 0.2s',
@@ -62,15 +56,11 @@ function InfoCard({ icon: Icon, titre, valeur, accent, delay }) {
     >
       <Box sx={{
         width: 40, height: 40, borderRadius: '12px',
-        background: `${accent}18`,
-        border: `1px solid ${accent}30`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0,
+        background: `${accent}18`, border: `1px solid ${accent}30`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
       }}>
         <Icon size={18} color={accent} strokeWidth={1.75} />
       </Box>
-
-      {/* Titre + valeur sur 1 seule ligne */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.75, flexWrap: 'wrap', flex: 1, minWidth: 0 }}>
         <Typography sx={{
           fontSize: 9.5, fontWeight: 700, color: accent,
@@ -91,7 +81,6 @@ function InfoCard({ icon: Icon, titre, valeur, accent, delay }) {
   )
 }
 
-// ── Champ formulaire ──────────────────────────────────────────
 function StyledField({ label, error, helperText, children }) {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.6 }}>
@@ -104,8 +93,7 @@ function StyledField({ label, error, helperText, children }) {
       </Typography>
       <Box sx={{
         '& .MuiOutlinedInput-root': {
-          borderRadius: '10px',
-          background: '#f4f8f5',
+          borderRadius: '10px', background: '#f4f8f5',
           fontSize: 14, color: '#0c1a10',
           '& fieldset': { borderColor: error ? '#ef4444' : '#dae8df', borderWidth: '1.5px' },
           '&:hover fieldset': { borderColor: error ? '#ef4444' : GREEN_MAIN },
@@ -140,47 +128,50 @@ export default function Contact() {
     <Box>
       <style>{CONTACT_STYLES}</style>
 
-      {/* ══════════ HERO — même fond que Home Hero ══════════ */}
+      {/* ══════════ HERO — même structure que Home ══════════ */}
       <Box sx={{
         background: 'linear-gradient(135deg, #0a2e18 0%, #0f4a25 50%, #1a5e32 100%)',
-        pt: { xs: 9, md: 12 }, pb: 0,
+        pt: { xs: 9, md: 0 }, pb: 0,
         position: 'relative', overflow: 'hidden',
+        // ── Même grid 55/45 que Home ──
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', md: '55% 45%' },
+        minHeight: { md: '520px' },
       }}>
-        {/* Grille de fond identique Home */}
+        {/* Grille de fond */}
         <Box sx={{
           position: 'absolute', inset: 0,
           backgroundImage: GRID_LINES,
           backgroundSize: '48px 48px',
           pointerEvents: 'none',
         }} />
-        {/* Halo orange identique Home */}
+        {/* Halo orange */}
         <Box sx={{
           position: 'absolute', width: 600, height: 600,
           right: -200, top: -200, borderRadius: '50%',
-          background: `radial-gradient(circle, ${ORANGE}10 0%, transparent 70%)`,
+          background: 'radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
 
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-
-          {/* Chip MFFE — identique Home Hero */}
+        {/* COLONNE GAUCHE — Chip + H1 + sous-titre */}
+        <Box sx={{
+          display: 'flex', flexDirection: 'column', justifyContent: 'center',
+          px: { xs: 3, md: 5 }, py: { xs: 10, md: 6 },
+          position: 'relative', zIndex: 1,
+        }}>
           <Box className="cfade cfade-1" sx={{
             display: 'inline-flex', alignItems: 'center', gap: 1,
-            mb: 3, px: 2, py: 0.55,
+            mb: 3, px: 2, py: 0.55, alignSelf: 'flex-start',
             borderRadius: '20px',
-            background: `${ORANGE}12`,
-            border: `1px solid ${ORANGE}30`,
+            background: 'rgba(245,166,35,0.12)',
+            border: '1px solid rgba(245,166,35,0.3)',
           }}>
-            <Box sx={{
-              width: 7, height: 7, borderRadius: '50%',
-              background: ORANGE, animation: 'pulse-dot 2s infinite',
-            }} />
+            <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: ORANGE, animation: 'pulse-dot 2s infinite' }} />
             <Typography sx={{ fontSize: 11, fontWeight: 600, color: ORANGE, letterSpacing: '0.3px' }}>
               🇨🇮 Ministère de la Femme, de la Famille et de l'Enfant
             </Typography>
           </Box>
 
-          {/* H1 — même typo que Home Hero */}
           <Typography
             className="cfade cfade-2"
             variant="h1"
@@ -188,6 +179,7 @@ export default function Contact() {
               fontFamily: "'Cormorant Garamond', serif",
               fontSize: { xs: 40, md: 60 },
               fontWeight: 700, color: '#fff', lineHeight: 1.0, mb: 2,
+              animation: 'fadeInUp 0.7s ease forwards',
             }}
           >
             Contactez{' '}
@@ -195,24 +187,98 @@ export default function Contact() {
             <br />d'Issia
           </Typography>
 
-          {/* Sous-titre — même style bordure gauche orange que Home */}
           <Typography
             className="cfade cfade-3"
             sx={{
               color: TEXT_MUTED, fontSize: { xs: 13, md: 14 }, lineHeight: 1.8,
-              maxWidth: 400, mb: 5,
+              maxWidth: 380, mb: 4,
               borderLeft: `3px solid ${ORANGE}`, pl: 2,
+              animation: 'fadeInUp 0.7s 0.15s ease both',
             }}
           >
             Notre équipe est disponible du{' '}
             <Box component="strong" sx={{ color: ORANGE }}>lundi au vendredi de 7h30 à 16h30</Box>{' '}
             pour répondre à toutes vos questions sur l'inscription, les sections ou la vie au CPPE.
           </Typography>
+        </Box>
 
-          {/* ── Layout principal ── */}
+        {/* COLONNE DROITE — Image identique Home */}
+        <Box sx={{
+          display: { xs: 'none', md: 'flex' },
+          alignItems: 'center', justifyContent: 'center',
+          px: 4, py: 6,
+          position: 'relative', zIndex: 1,
+        }}>
+          {/* Bordure décalée — identique Home */}
+          <Box sx={{
+            position: 'absolute',
+            width: 'calc(100% - 56px)',
+            aspectRatio: '1 / 1',
+            maxWidth: 420,
+            border: '2px solid rgba(245,166,35,0.4)',
+            borderRadius: '24px',
+            top: '50%', left: '50%',
+            transform: 'translate(calc(-50% + 10px), calc(-50% + 10px))',
+            pointerEvents: 'none',
+          }} />
+          {/* Image — identique Home */}
+          <Box sx={{
+            width: '100%', maxWidth: 420,
+            aspectRatio: '1 / 1',
+            borderRadius: '20px', overflow: 'hidden',
+            boxShadow: '0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)',
+            position: 'relative', flexShrink: 0,
+          }}>
+            <Box
+              component="img"
+              src={ecoleImage}
+              alt="École CPPE Issia"
+              sx={{
+                width: '100%', height: '100%',
+                objectFit: 'cover', objectPosition: 'center',
+                display: 'block',
+                transition: 'transform 8s ease',
+                '&:hover': { transform: 'scale(1.04)' },
+              }}
+            />
+            {/* Gradient bas — identique Home */}
+            <Box sx={{
+              position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%',
+              background: 'linear-gradient(to top, rgba(10,46,24,0.7) 0%, transparent 100%)',
+              pointerEvents: 'none',
+            }} />
+            {/* Badge — identique Home */}
+            <Box sx={{
+              position: 'absolute', bottom: 18, left: 18,
+              background: 'rgba(245,166,35,0.95)',
+              backdropFilter: 'blur(8px)',
+              borderRadius: '10px', px: 1.75, py: 1,
+              display: 'flex', alignItems: 'center', gap: 1,
+            }}>
+              <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: '#0f4a25', animation: 'pulse-dot 2s infinite' }} />
+              <Typography sx={{ fontSize: 11.5, fontWeight: 800, color: '#0f4a25' }}>
+                CPPE d'Issia
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* ══════════ CARTES INFO + FORMULAIRE ══════════ */}
+      <Box sx={{
+        background: 'linear-gradient(135deg, #0a2e18 0%, #0f4a25 50%, #1a5e32 100%)',
+        pb: 0, position: 'relative', overflow: 'hidden',
+      }}>
+        <Box sx={{
+          position: 'absolute', inset: 0,
+          backgroundImage: GRID_LINES,
+          backgroundSize: '48px 48px',
+          pointerEvents: 'none',
+        }} />
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
           <Grid container spacing={4} alignItems="flex-start">
 
-            {/* GAUCHE — 4 cartes info alignées */}
+            {/* GAUCHE — 4 cartes info */}
             <Grid item xs={12} md={4}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.25, pb: { xs: 0, md: 6 } }}>
                 <InfoCard icon={MapPin} titre="Adresse"
@@ -230,7 +296,7 @@ export default function Contact() {
               </Box>
             </Grid>
 
-            {/* DROITE — formulaire flottant */}
+            {/* DROITE — Formulaire flottant */}
             <Grid item xs={12} md={8}>
               <Box
                 className="cfade cfade-4"
@@ -241,9 +307,7 @@ export default function Contact() {
                   overflow: 'hidden',
                 }}
               >
-                {/* Barre dégradée — reprend les couleurs site */}
                 <Box sx={{ height: 5, background: `linear-gradient(90deg, #0a2e18, ${GREEN_MAIN}, ${ORANGE}, #8bc34a)` }} />
-
                 <Box sx={{ p: { xs: 3, md: 4.5 } }}>
                   {sent ? (
                     <Box sx={{ textAlign: 'center', py: { xs: 5, md: 7 } }}>
@@ -288,14 +352,10 @@ export default function Contact() {
                     </Box>
                   ) : (
                     <>
-                      {/* En-tête formulaire — même label style que Home sections */}
                       <Box sx={{ mb: 3.5 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
                           <Box sx={{ width: 28, height: 2, background: ORANGE }} />
-                          <Typography sx={{
-                            fontSize: 11, fontWeight: 700, color: ORANGE,
-                            letterSpacing: '3px', textTransform: 'uppercase',
-                          }}>
+                          <Typography sx={{ fontSize: 11, fontWeight: 700, color: ORANGE, letterSpacing: '3px', textTransform: 'uppercase' }}>
                             Formulaire de contact
                           </Typography>
                         </Box>
@@ -348,7 +408,6 @@ export default function Contact() {
                             </StyledField>
                           </Grid>
 
-                          {/* Zone message — agrandie à 9 lignes */}
                           <Grid item xs={12}>
                             <StyledField label="Votre message *" error={!!errors.message} helperText={errors.message?.message}>
                               <TextField
@@ -376,7 +435,6 @@ export default function Contact() {
                             </StyledField>
                           </Grid>
 
-                          {/* Bouton — même style que les CTA de Home */}
                           <Grid item xs={12}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
                               <Button
@@ -400,18 +458,12 @@ export default function Contact() {
                                 {mutation.isPending ? 'Envoi en cours…' : 'Envoyer le message'}
                               </Button>
 
-                              {/* Badge délai — même chip style que InfoBar Home */}
                               <Box sx={{
                                 display: 'inline-flex', alignItems: 'center', gap: 0.75,
-                                px: 1.75, py: 0.55,
-                                borderRadius: '20px',
-                                background: `${ORANGE}12`,
-                                border: `1px solid ${ORANGE}30`,
+                                px: 1.75, py: 0.55, borderRadius: '20px',
+                                background: `${ORANGE}12`, border: `1px solid ${ORANGE}30`,
                               }}>
-                                <Box sx={{
-                                  width: 6, height: 6, borderRadius: '50%',
-                                  background: ORANGE, animation: 'pulse-dot 2s infinite',
-                                }} />
+                                <Box sx={{ width: 6, height: 6, borderRadius: '50%', background: ORANGE, animation: 'pulse-dot 2s infinite' }} />
                                 <Typography sx={{ fontSize: 11.5, fontWeight: 600, color: ORANGE }}>
                                   Réponse sous 24h ouvrées
                                 </Typography>
@@ -430,11 +482,10 @@ export default function Contact() {
         </Container>
       </Box>
 
-      {/* ══════════ LOCALISATION — même fond blanc que ContactRapide Home ══════════ */}
+      {/* ══════════ LOCALISATION ══════════ */}
       <Box sx={{ background: '#fff', py: { xs: 5, md: 7 } }}>
         <Container maxWidth="lg">
 
-          {/* Label section — identique à toutes les sections Home */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
             <Box sx={{ width: 28, height: 2, background: ORANGE }} />
             <Typography sx={{ fontSize: 11, fontWeight: 700, color: ORANGE, letterSpacing: '3px', textTransform: 'uppercase' }}>
@@ -448,7 +499,6 @@ export default function Contact() {
             display: 'flex', flexDirection: { xs: 'column', md: 'row' },
             boxShadow: '0 8px 40px rgba(27,122,62,0.08)',
           }}>
-            {/* Panneau vert — même dégradé que MotDirecteur / InscriptionCTA */}
             <Box sx={{
               background: 'linear-gradient(160deg, #0a2e18 0%, #0f4a25 55%, #1B7A3E 100%)',
               p: { xs: 3.5, md: 4.5 },
@@ -472,7 +522,7 @@ export default function Contact() {
                   <Typography sx={{ fontSize: 10, fontWeight: 700, color: ORANGE, letterSpacing: '2px', textTransform: 'uppercase' }}>
                     Où nous trouver
                   </Typography>
-                  <Typography sx={{ fontSize: 13, color: TEXT_DIM }}>CPPE d'Issia</Typography>
+                  <Typography sx={{ fontSize: 13, color: 'rgba(255,255,255,0.42)' }}>CPPE d'Issia</Typography>
                 </Box>
               </Box>
               <Typography sx={{
@@ -503,7 +553,6 @@ export default function Contact() {
               </Box>
             </Box>
 
-            {/* Placeholder carte */}
             <Box sx={{
               flex: 1, minHeight: { xs: 220, md: 300 },
               background: 'linear-gradient(135deg, #eaf4ee 0%, #f4f8f5 50%, #dae8df 100%)',
