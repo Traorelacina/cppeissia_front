@@ -1,0 +1,238 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --vert: #1B7A3E;
+  --vert-dark: #0f4a25;
+  --vert-medium: #237d42;
+  --vert-light: #eaf4ee;
+  --or: #F5A623;
+  --or-dark: #b87b0f;
+  --or-light: #fff8ea;
+  --noir: #0c1a10;
+  --gris-f: #2d3a30;
+  --gris-m: #6b7c70;
+  --gris-l: #f3f7f4;
+  --blanc: #ffffff;
+  --bordure: #dae8df;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  color: var(--gris-f);
+  background-color: #f0f4f1;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========================
+   SCROLLBAR PERSONNALISÉE
+======================== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--gris-l);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--vert);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--vert-dark);
+}
+
+/* ========================
+   TYPOGRAPHIE
+======================== */
+.font-titre {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+/* ========================
+   ANIMATIONS
+======================== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.6s ease forwards;
+}
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease forwards;
+}
+.animate-slideInLeft {
+  animation: slideInLeft 0.5s ease forwards;
+}
+.animate-pulse-dot {
+  animation: pulse-dot 2s infinite;
+}
+
+/* Délais d'animation */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* ========================
+   PROSE / QUILL EDITOR
+======================== */
+.ql-editor {
+  min-height: 200px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+}
+
+/* ========================
+   MUI OVERRIDES
+======================== */
+.MuiButton-root {
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  border-radius: 10px !important;
+}
+
+.MuiTextField-root .MuiOutlinedInput-root {
+  border-radius: 10px !important;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gris-m) !important;
+}
+
+.MuiChip-root {
+  font-family: 'Outfit', sans-serif !important;
+  font-weight: 600 !important;
+  border-radius: 6px !important;
+}
+
+/* ========================
+   SECTION COMMUNE
+======================== */
+.section-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.eyebrow-line {
+  width: 30px;
+  height: 2px;
+  background: var(--or);
+}
+
+/* ========================
+   CARDS
+======================== */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(27, 122, 62, 0.12) !important;
+}
+
+/* ========================
+   ADMIN SIDEBAR
+======================== */
+.admin-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.2s ease;
+  border-radius: 0 8px 8px 0;
+  margin-right: 8px;
+  text-decoration: none;
+}
+
+.admin-sidebar-item:hover {
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.admin-sidebar-item.active {
+  color: var(--or);
+  border-left-color: var(--or);
+  background: rgba(245, 166, 35, 0.08);
+}
+
+/* ========================
+   STATUS BADGES
+======================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+}
+.badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.badge-success { background: #dcfce7; color: #15803d; }
+.badge-success::before { background: #15803d; }
+.badge-warning { background: #fef9c3; color: #854d0e; }
+.badge-warning::before { background: #ca8a04; }
+.badge-info { background: #dbeafe; color: #1d4ed8; }
+.badge-info::before { background: #3b82f6; }
+.badge-error { background: #fee2e2; color: #dc2626; }
+.badge-error::before { background: #dc2626; }
+.badge-neutral { background: #f3f4f6; color: #6b7280; }
+.badge-neutral::before { background: #9ca3af; }
