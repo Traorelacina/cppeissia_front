@@ -1,28 +1,41 @@
 {
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+
     "target": "ES2022",
-    "useDefineForClassFields": true,
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "types": ["vite/client"],
-    "skipLibCheck": true,
 
-    /* Bundler mode */
+    "jsx": "react-jsx",
+    "types": ["vite/client"],
+
+    /* 🔥 IMPORTANT : alias @ */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    /* 🔥 IMPORTANT : compat Netlify */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
-    "jsx": "react-jsx",
 
-    /* Linting */
+    /* 🔥 IMPORTANT : JS support */
+    "allowJs": true,
+    "checkJs": false,
+
+    /* Qualité */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+
+    /* ⚠️ éviter blocages inutiles en build */
+    "skipLibCheck": true
   },
-  "include": ["src"]
+
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }
