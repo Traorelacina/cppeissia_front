@@ -13,7 +13,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://used-edyth-freelence-0891ef2c.koyeb.app/',
+        target: 'https://used-edyth-freelence-0891ef2c.koyeb.app',
         changeOrigin: true,
       },
     },
