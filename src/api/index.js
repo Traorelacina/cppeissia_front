@@ -1,7 +1,17 @@
 import axios from 'axios'
 
+// Déterminer l'URL de base en fonction de l'environnement
+const getBaseURL = () => {
+  // En production (Netlify), utiliser l'URL complète de Koyeb
+  if (import.meta.env.PROD) {
+    return 'https://used-edyth-freelence-0891ef2c.koyeb.app/api'
+  }
+  // En développement, utiliser le proxy ou l'URL de développement
+  return import.meta.env.VITE_API_URL || '/api'
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json',
     Accept: 'application/json',
@@ -16,7 +26,10 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('cppe_token')
 
   console.group(`📤 [API] ${config.method?.toUpperCase()} ${config.url}`)
+  console.log('BaseURL:', config.baseURL)
+  console.log('Full URL:', `${config.baseURL}${config.url}`)
   console.log('Token présent :', !!token, token ? token.substring(0, 20) + '...' : '(aucun)')
+  console.log('Environnement :', import.meta.env.MODE)
   console.groupEnd()
 
   if (token) {
@@ -43,11 +56,14 @@ api.interceptors.response.use(
     const onLogin  = window.location.pathname.includes('/admin/login')
 
     console.group(`❌ [API ERROR] ${status} ${method} ${url}`)
+    console.log('BaseURL:', error.config?.baseURL)
+    console.log('Full URL:', `${error.config?.baseURL}${url}`)
     console.log('Message backend :', error.response?.data?.message)
     console.log('Est requête login  :', isLogin)
     console.log('Sur page /login    :', onLogin)
     console.log('Pathname actuel    :', window.location.pathname)
     console.log('Token localStorage :', !!localStorage.getItem('cppe_token'))
+    console.log('Environnement :', import.meta.env.MODE)
     console.log('Réponse complète   :', error.response?.data)
     console.groupEnd()
 
