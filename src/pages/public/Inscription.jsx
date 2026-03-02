@@ -12,10 +12,10 @@ import toast from 'react-hot-toast'
 
 const STEPS  = ['L\'enfant', 'Le responsable', 'Dossier & section']
 const SECTIONS = [
-  { val: 'creche',          label: 'Crèche (1 an 6 mois — 2 ans 11 mois)' },
-  { val: 'petite_section',  label: 'Petite Section (3 ans — 3 ans 11 mois)' },
-  { val: 'moyenne_section', label: 'Moyenne Section (4 ans — 4 ans 11 mois)' },
-  { val: 'grande_section',  label: 'Grande Section (5 ans — 5 ans 11 mois)' },
+  { val: 'creche', label: 'Crèche (1 an 6 mois — 2 ans 11 mois)' },
+  { val: 'ps',     label: 'Petite Section (3 ans — 3 ans 11 mois)' },
+  { val: 'ms',     label: 'Moyenne Section (4 ans — 4 ans 11 mois)' },
+  { val: 'gs',     label: 'Grande Section (5 ans — 5 ans 11 mois)' },
 ]
 
 export default function Inscription() {
