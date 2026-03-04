@@ -2,12 +2,13 @@
 // ACTIVITES LIST - redesign éditorial
 // ============================================================
 import { useState } from 'react'
-import { Box, Container, Grid, Typography, Chip, Select, MenuItem, FormControl, Button } from '@mui/material'
+import { Box, Container, Grid, Typography, Chip, Select, MenuItem, FormControl } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { activitesApi } from '@/api/services'
-import { LoadingSpinner, EmptyState } from '@/components/common'
-import { Image as ImageIcon, ArrowRight, Sparkles, Camera, ChevronDown } from 'lucide-react'
+import { LoadingSpinner } from '@/components/common'
+import { ArrowRight, Sparkles, Camera, ChevronDown } from 'lucide-react'
+import { getImageUrl } from '@/utils/imageHelper'
 
 const ACT_STYLES = `
   @keyframes fadeInUp {
@@ -59,6 +60,15 @@ const SECTION_META = {
 function ActCard({ act, index }) {
   const sc = SECTION_META[act.section] || { bg: '#f3f4f6', color: '#374151', dot: '#9e9e9e', label: act.section }
   const isFeatured = index === 0
+  const [imageError, setImageError] = useState(false)
+
+  // Utiliser le helper pour obtenir l'URL correcte
+  const imageUrl = act.photo_couverture ? getImageUrl(act.photo_couverture) : null
+
+  const handleImageError = () => {
+    setImageError(true)
+    console.log('❌ Erreur chargement image:', act.photo_couverture)
+  }
 
   return (
     <Box className="act-card" sx={{ height: '100%' }}>
@@ -90,16 +100,31 @@ function ActCard({ act, index }) {
           background: sc.bg,
           minHeight: isFeatured ? { md: 420 } : 'auto',
         }}>
-          {act.photo_couverture ? (
+          {imageUrl && !imageError ? (
             <Box
               component="img"
-              src={act.photo_couverture}
+              src={imageUrl}
               alt={act.titre}
               className="act-img"
-              sx={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0, display: 'block' }}
+              onError={handleImageError}
+              sx={{ 
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'cover', 
+                position: 'absolute', 
+                inset: 0, 
+                display: 'block' 
+              }}
             />
           ) : (
-            <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Box sx={{ 
+              position: 'absolute', 
+              inset: 0, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              background: sc.bg,
+            }}>
               <Sparkles size={isFeatured ? 64 : 44} color={sc.color} style={{ opacity: 0.18 }} />
             </Box>
           )}

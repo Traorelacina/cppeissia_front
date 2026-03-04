@@ -1,3 +1,4 @@
+// src/api/index.js
 import axios from 'axios'
 
 // Déterminer l'URL de base en fonction de l'environnement
@@ -20,6 +21,55 @@ const api = axios.create({
 })
 
 // ─────────────────────────────────────────────
+// FONCTION DE CORRECTION DES URLS D'IMAGES
+// ─────────────────────────────────────────────
+const API_BASE_URL = 'https://used-edyth-freelence-0891ef2c.koyeb.app';
+
+const fixImageUrlsInData = (data) => {
+  if (!data || typeof data !== 'object') return data;
+  
+  // Fonction récursive pour parcourir tous les niveaux de l'objet
+  const traverse = (obj) => {
+    if (!obj || typeof obj !== 'object') return;
+    
+    Object.keys(obj).forEach(key => {
+      const value = obj[key];
+      
+      // Vérifier si c'est une propriété qui pourrait contenir une URL d'image
+      const isImageProperty = 
+        key.toLowerCase().includes('photo') ||
+        key.toLowerCase().includes('image') ||
+        key.toLowerCase().includes('url') ||
+        key.toLowerCase().includes('thumb') ||
+        key.toLowerCase().includes('cover') ||
+        key.toLowerCase().includes('media') ||
+        (typeof value === 'string' && value.includes('/storage/'));
+      
+      if (isImageProperty && typeof value === 'string') {
+        // Corriger l'URL si nécessaire
+        if (value.includes('localhost') || value.includes('127.0.0.1')) {
+          obj[key] = value.replace(/http:\/\/[^\/]+/, API_BASE_URL);
+        }
+        else if (value.startsWith('/storage')) {
+          obj[key] = `${API_BASE_URL}${value}`;
+        }
+        else if (value.startsWith('http') && !value.includes(API_BASE_URL)) {
+          // Si c'est une autre URL http, on garde telle quelle
+          console.log('URL externe détectée:', value);
+        }
+      }
+      // Récursion pour les objets et tableaux imbriqués
+      else if (typeof value === 'object' && value !== null) {
+        traverse(value);
+      }
+    });
+  };
+  
+  traverse(data);
+  return data;
+};
+
+// ─────────────────────────────────────────────
 // REQUEST — log + injection token
 // ─────────────────────────────────────────────
 api.interceptors.request.use((config) => {
@@ -39,10 +89,15 @@ api.interceptors.request.use((config) => {
 })
 
 // ─────────────────────────────────────────────
-// RESPONSE — log + gestion 401
+// RESPONSE — log + correction URLs images + gestion 401
 // ─────────────────────────────────────────────
 api.interceptors.response.use(
   (response) => {
+    // Corriger les URLs des images dans la réponse
+    if (response.data) {
+      fixImageUrlsInData(response.data);
+    }
+    
     console.group(`📥 [API] ${response.status} ${response.config?.method?.toUpperCase()} ${response.config?.url}`)
     console.log('Data :', response.data)
     console.groupEnd()
