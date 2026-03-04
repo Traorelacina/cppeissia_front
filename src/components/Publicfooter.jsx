@@ -4,6 +4,9 @@ import { MapPin, Phone, Mail, Clock, BookOpen, ArrowUpRight } from 'lucide-react
 import { useQuery } from '@tanstack/react-query'
 import { parametresApi } from '@/api/services'
 
+// COULEUR ORANGE DU MINISTÈRE
+const ORANGE = '#FF7F27'
+
 const LINKS = {
   etablissement: [
     { label: 'Présentation', href: '/presentation' },
@@ -38,14 +41,12 @@ export default function PublicFooter() {
     ? Number(params.scolarite_montant).toLocaleString('fr-FR')
     : '50 000'
 
-  // Extrait la 1ère année de "2025-2026" → 2025
-  // Les versements 2 et 3 tombent en Novembre et Décembre de la 1ère année
   const anneeVersement = annee.includes('-') ? annee.split('-')[0].trim() : annee
 
   return (
     <Box component="footer" sx={{ background: '#0c1a10', color: 'rgba(255,255,255,0.6)', mt: 0 }}>
 
-      {/* BANDE SUPÉRIEURE — visible seulement si inscriptions ouvertes */}
+      {/* BANDE SUPÉRIEURE */}
       {isOpen && (
         <Box sx={{ background: '#1B7A3E', py: 2 }}>
           <Container maxWidth="lg">
@@ -59,7 +60,7 @@ export default function PublicFooter() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: 1,
-                    background: '#F5A623',
+                    background: ORANGE,
                     color: '#0f4a25',
                     px: 2,
                     py: 0.75,
@@ -87,7 +88,7 @@ export default function PublicFooter() {
                 sx={{
                   width: 40,
                   height: 40,
-                  background: '#F5A623',
+                  background: ORANGE,
                   borderRadius: '10px',
                   display: 'flex',
                   alignItems: 'center',
@@ -98,7 +99,7 @@ export default function PublicFooter() {
               </Box>
               <Box>
                 <Box sx={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>
-                  CPPE <span style={{ color: '#F5A623' }}>ISSIA</span>
+                  CPPE <span style={{ color: ORANGE }}>ISSIA</span>
                 </Box>
                 <Box sx={{ fontSize: 10, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
                   Petite Enfance
@@ -118,7 +119,7 @@ export default function PublicFooter() {
                 { icon: Clock,  text: horaires },
               ].map(({ icon: Icon, text }) => (
                 <Box key={text} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-                  <Icon size={15} color="#F5A623" style={{ flexShrink: 0, marginTop: 2 }} />
+                  <Icon size={15} color={ORANGE} style={{ flexShrink: 0, marginTop: 2 }} />
                   <Typography sx={{ fontSize: 12.5 }}>{text}</Typography>
                 </Box>
               ))}
@@ -138,7 +139,7 @@ export default function PublicFooter() {
                     mb: 1,
                     color: 'rgba(255,255,255,0.5)',
                     transition: 'color 0.2s',
-                    '&:hover': { color: '#F5A623' },
+                    '&:hover': { color: ORANGE },
                   }}
                 >
                   {l.label}
@@ -160,7 +161,7 @@ export default function PublicFooter() {
                     mb: 1,
                     color: 'rgba(255,255,255,0.5)',
                     transition: 'color 0.2s',
-                    '&:hover': { color: '#F5A623' },
+                    '&:hover': { color: ORANGE },
                   }}
                 >
                   {l.label}
@@ -196,7 +197,7 @@ export default function PublicFooter() {
                   sx={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', py: 0.3 }}
                 >
                   <span style={{ color: 'rgba(255,255,255,0.45)' }}>{label}</span>
-                  <span style={{ color: '#F5A623', fontWeight: 600 }}>{value}</span>
+                  <span style={{ color: ORANGE, fontWeight: 600 }}>{value}</span>
                 </Box>
               ))}
             </Box>

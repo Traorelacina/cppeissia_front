@@ -26,10 +26,14 @@ import {
   Calendar,
   Phone,
   Layers,
+  User,
 } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from "@tanstack/react-query";
 import { parametresApi } from '@/api/services'
 import logo from '../assets/logo.jpeg'
+
+// COULEUR ORANGE DU MINISTÈRE
+const ORANGE = '#FF7F27'
 
 const NAV_ITEMS = [
   { label: 'Accueil',      href: '/',            icon: Home },
@@ -44,7 +48,7 @@ const NAV_ITEMS = [
       { label: 'Grande Section',  href: '/sections/grande-section' },
     ],
   },
-  { label: 'Inscription', href: '/inscription', icon: BookOpen },
+  { label: 'Inscription', href: '/inscription', icon: BookOpen, hidden: true }, // Ajout de hidden: true
   { label: 'Activités',   href: '/activites',   icon: Users },
   { label: 'Calendrier',  href: '/calendrier',  icon: Calendar },
   { label: 'Contact',     href: '/contact',     icon: Phone },
@@ -67,8 +71,6 @@ export default function PublicHeader() {
   })
 
   const params = parametresData?.data?.data || {}
-  const isOpen = params.inscriptions_ouvertes !== 'false'
-  const annee  = params.annee_scolaire_courante || '2025-2026'
 
   return (
     <>
@@ -88,7 +90,6 @@ export default function PublicHeader() {
           sx={{
             px: { xs: 2, md: 5 },
             py: 0,
-            // ── Hauteur augmentée : 72px (au lieu de 64px) ──
             minHeight: { xs: '64px !important', md: '76px !important' },
           }}
         >
@@ -98,20 +99,19 @@ export default function PublicHeader() {
             to="/"
             style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 11, flexShrink: 0 }}
           >
-            {/* Conteneur avec fond blanc léger + border-radius → logo arrondi */}
             <Box
               sx={{
                 width:  { xs: 44, md: 52 },
                 height: { xs: 44, md: 52 },
-                borderRadius: '16px',           // arrondi, pas carré, pas cercle parfait
+                borderRadius: '16px',
                 overflow: 'hidden',
-                border: '2px solid rgba(245,166,35,0.55)',
+                border: `2px solid rgba(255,127,39,0.55)`,
                 boxShadow: '0 2px 14px rgba(0,0,0,0.28)',
                 flexShrink: 0,
                 transition: 'transform 0.2s, box-shadow 0.2s',
                 '&:hover': {
                   transform: 'scale(1.04)',
-                  boxShadow: '0 4px 20px rgba(245,166,35,0.25)',
+                  boxShadow: `0 4px 20px rgba(255,127,39,0.25)`,
                 },
               }}
             >
@@ -128,7 +128,6 @@ export default function PublicHeader() {
               />
             </Box>
 
-            {/* Nom institution à côté du logo — optionnel, visible desktop uniquement */}
             {!isMobile && (
               <Box sx={{ lineHeight: 1.2 }}>
                 <Box sx={{ fontSize: '13px', fontWeight: 800, color: '#fff', letterSpacing: '0.2px' }}>
@@ -144,8 +143,11 @@ export default function PublicHeader() {
           {/* ══ NAV DESKTOP ══ */}
           {!isMobile && (
             <Box sx={{ display: 'flex', alignItems: 'stretch', ml: 4, flex: 1 }}>
-              {NAV_ITEMS.map((item) =>
-                item.children ? (
+              {NAV_ITEMS.map((item) => {
+                // Ne pas afficher si hidden est true
+                if (item.hidden) return null;
+                
+                return item.children ? (
                   <Box
                     key={item.label}
                     sx={{ position: 'relative', display: 'flex', alignItems: 'stretch' }}
@@ -168,7 +170,7 @@ export default function PublicHeader() {
                         fontWeight: 600,
                         px: 1.75,
                         borderRadius: 0,
-                        borderBottom: dropdownOpen ? '2px solid #F5A623' : '2px solid transparent',
+                        borderBottom: dropdownOpen ? `2px solid ${ORANGE}` : '2px solid transparent',
                         transition: 'all 0.2s',
                         '&:hover': { color: '#fff', background: 'rgba(255,255,255,0.05)' },
                       }}
@@ -199,14 +201,14 @@ export default function PublicHeader() {
                             style={({ isActive }) => ({
                               display: 'block',
                               padding: '11px 18px',
-                              color: isActive ? '#F5A623' : 'rgba(255,255,255,0.68)',
+                              color: isActive ? ORANGE : 'rgba(255,255,255,0.68)',
                               fontSize: '12.5px',
                               fontWeight: isActive ? 700 : 500,
                               textDecoration: 'none',
-                              borderLeft: isActive ? '3px solid #F5A623' : '3px solid transparent',
+                              borderLeft: isActive ? `3px solid ${ORANGE}` : '3px solid transparent',
                               borderBottom: idx < item.children.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none',
                               transition: 'all 0.15s',
-                              background: isActive ? 'rgba(245,166,35,0.06)' : 'transparent',
+                              background: isActive ? `rgba(255,127,39,0.06)` : 'transparent',
                             })}
                             onClick={() => setDropdownOpen(false)}
                           >
@@ -224,11 +226,11 @@ export default function PublicHeader() {
                       display: 'flex',
                       alignItems: 'center',
                       padding: '0 13px',
-                      color: isActive ? '#F5A623' : 'rgba(255,255,255,0.72)',
+                      color: isActive ? ORANGE : 'rgba(255,255,255,0.72)',
                       fontSize: '12.5px',
                       fontWeight: 600,
                       textDecoration: 'none',
-                      borderBottom: isActive ? '2px solid #F5A623' : '2px solid transparent',
+                      borderBottom: isActive ? `2px solid ${ORANGE}` : '2px solid transparent',
                       transition: 'all 0.2s',
                       whiteSpace: 'nowrap',
                     })}
@@ -236,37 +238,38 @@ export default function PublicHeader() {
                     {item.label}
                   </NavLink>
                 )
-              )}
+              })}
             </Box>
           )}
 
-          {/* ══ CTA DESKTOP + BURGER MOBILE ══ */}
+          {/* ══ BOUTON ESPACE PARENT + BURGER MOBILE ══ */}
           <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }}>
-            {!isMobile && isOpen && (
+            {!isMobile && (
               <Button
                 component={Link}
-                to="/inscription"
+                to="/espace-parent"
                 variant="contained"
                 size="small"
+                startIcon={<User size={14} />}
                 sx={{
-                  background: '#F5A623',
+                  background: ORANGE,
                   color: '#0f4a25',
                   fontWeight: 800,
                   fontSize: '12px',
                   px: 2.25,
                   py: 0.9,
                   borderRadius: '30px',
-                  boxShadow: '0 3px 14px rgba(245,166,35,0.35)',
+                  boxShadow: `0 3px 14px rgba(255,127,39,0.35)`,
                   whiteSpace: 'nowrap',
                   transition: 'all 0.2s',
                   '&:hover': {
-                    background: '#e0951f',
+                    background: '#e66e00',
                     transform: 'translateY(-1px)',
-                    boxShadow: '0 5px 18px rgba(245,166,35,0.4)',
+                    boxShadow: `0 5px 18px rgba(255,127,39,0.4)`,
                   },
                 }}
               >
-                S'inscrire {annee}
+                Espace parent
               </Button>
             )}
 
@@ -297,7 +300,6 @@ export default function PublicHeader() {
           sx: { width: 285, background: '#0a2e18', color: '#fff', pt: 1 },
         }}
       >
-        {/* En-tête drawer */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, pb: 2, borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Box
@@ -305,7 +307,7 @@ export default function PublicHeader() {
                 width: 38, height: 38,
                 borderRadius: '12px',
                 overflow: 'hidden',
-                border: '1.5px solid rgba(245,166,35,0.5)',
+                border: `1.5px solid rgba(255,127,39,0.5)`,
               }}
             >
               <Box component="img" src={logo} alt="Logo CPPE Issia" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
@@ -321,8 +323,11 @@ export default function PublicHeader() {
         </Box>
 
         <List sx={{ py: 1 }}>
-          {NAV_ITEMS.map((item) =>
-            item.children ? (
+          {NAV_ITEMS.map((item) => {
+            // Ne pas afficher si hidden est true
+            if (item.hidden) return null;
+            
+            return item.children ? (
               <Box key={item.label}>
                 <ListItem
                   button
@@ -345,7 +350,7 @@ export default function PublicHeader() {
                       component={Link}
                       to={child.href}
                       onClick={() => setMobileOpen(false)}
-                      sx={{ pl: 4, color: 'rgba(255,255,255,0.5)', py: 0.85, borderLeft: '2px solid rgba(245,166,35,0.2)', ml: 2 }}
+                      sx={{ pl: 4, color: 'rgba(255,255,255,0.5)', py: 0.85, borderLeft: `2px solid rgba(255,127,39,0.2)`, ml: 2 }}
                     >
                       <ListItemText primary={child.label} primaryTypographyProps={{ fontSize: 12.5 }} />
                     </ListItem>
@@ -359,9 +364,9 @@ export default function PublicHeader() {
                 to={item.href}
                 onClick={() => setMobileOpen(false)}
                 sx={{
-                  color: location.pathname === item.href ? '#F5A623' : 'rgba(255,255,255,0.72)',
-                  borderLeft: location.pathname === item.href ? '3px solid #F5A623' : '3px solid transparent',
-                  background: location.pathname === item.href ? 'rgba(245,166,35,0.05)' : 'transparent',
+                  color: location.pathname === item.href ? ORANGE : 'rgba(255,255,255,0.72)',
+                  borderLeft: location.pathname === item.href ? `3px solid ${ORANGE}` : '3px solid transparent',
+                  background: location.pathname === item.href ? `rgba(255,127,39,0.05)` : 'transparent',
                   py: 1.1,
                   transition: 'all 0.15s',
                 }}
@@ -369,31 +374,30 @@ export default function PublicHeader() {
                 <ListItemText primary={item.label} primaryTypographyProps={{ fontSize: 13, fontWeight: 600 }} />
               </ListItem>
             )
-          )}
+          })}
         </List>
 
-        {isOpen && (
-          <Box sx={{ px: 2, pt: 1, pb: 2 }}>
-            <Button
-              component={Link}
-              to="/inscription"
-              variant="contained"
-              fullWidth
-              onClick={() => setMobileOpen(false)}
-              sx={{
-                background: '#F5A623',
-                color: '#0f4a25',
-                fontWeight: 800,
-                fontSize: '13px',
-                py: 1.25,
-                borderRadius: '30px',
-                '&:hover': { background: '#e0951f' },
-              }}
-            >
-              S'inscrire {annee}
-            </Button>
-          </Box>
-        )}
+        <Box sx={{ px: 2, pt: 1, pb: 2 }}>
+          <Button
+            component={Link}
+            to="/espace-parent"
+            variant="contained"
+            fullWidth
+            startIcon={<User size={15} />}
+            onClick={() => setMobileOpen(false)}
+            sx={{
+              background: ORANGE,
+              color: '#0f4a25',
+              fontWeight: 800,
+              fontSize: '13px',
+              py: 1.25,
+              borderRadius: '30px',
+              '&:hover': { background: '#e66e00' },
+            }}
+          >
+            Espace parent
+          </Button>
+        </Box>
       </Drawer>
     </>
   )

@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import { Baby, Smile, BookOpen, GraduationCap, Clock, Users, Star, Package, ChevronRight } from 'lucide-react'
 import { useState } from 'react'
 
+// COULEUR ORANGE DU MINISTÈRE
+const ORANGE = '#FF7F27'
+
 // ─────────────────────────────────────────────────────────────
 // Données officielles issues du document CPPE Issia 2025-2026
 // ─────────────────────────────────────────────────────────────
@@ -34,8 +37,8 @@ const SECTIONS_CONFIG = [
     sublabel: 'PS',
     tranche: '3 ans — 3 ans 11 mois',
     icon: Smile,
-    color: '#F5A623',
-    darkColor: '#b87b0f',
+    color: ORANGE,
+    darkColor: '#cc6400',
     accent: '#fff8e1',
     accentBorder: '#ffe082',
     places: '40',
@@ -93,7 +96,7 @@ const SECTIONS_CONFIG = [
 // Composant page Section individuelle (interne)
 // ─────────────────────────────────────────────────────────────
 function SectionPage({ config }) {
-  const [showFournitures, setShowFournitures] = useState(false)
+  const [showFournitures, setShowFournitures] = useState(true)
   const Icon = config.icon
 
   return (
@@ -164,7 +167,9 @@ function SectionPage({ config }) {
                 {config.objectifs}
               </Typography>
 
-              <Typography sx={{ fontWeight: 700, fontSize: 13.5, color: '#0c1a10', mb: 1.5 }}>Activités pratiquées</Typography>
+              <Typography variant="h2" sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 26, md: 36 }, fontWeight: 700, color: '#0c1a10', mb: 2 }}>
+                Activités pratiquées
+              </Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 3 }}>
                 {config.activites.map((a) => (
                   <Chip key={a} label={a} size="small"

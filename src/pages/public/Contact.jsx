@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import { useMutation } from '@tanstack/react-query'
 import api from '@/api'
 import toast from 'react-hot-toast'
-import ecoleImage from '../../assets/ecole.jpg'
 
 const CONTACT_STYLES = `
   @keyframes fadeInUp {
@@ -32,7 +31,7 @@ const GREEN_MAIN = '#1B7A3E'
 const GREEN_DARK = '#0f4a25'
 const GREEN_CTA  = 'linear-gradient(135deg, #0f4a25, #1B7A3E)'
 const GREEN_HOV  = 'linear-gradient(135deg, #0a2e18, #0f4a25)'
-const ORANGE     = '#F5A623'
+const ORANGE     = '#FF7F27'
 const TEXT_MUTED = 'rgba(255,255,255,0.65)'
 const BORDER_DIM = 'rgba(255,255,255,0.1)'
 const GRID_LINES = 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)'
@@ -128,140 +127,47 @@ export default function Contact() {
     <Box>
       <style>{CONTACT_STYLES}</style>
 
-      {/* ══════════ HERO — même structure que Home ══════════ */}
+      {/* ══════════ HERO SIMPLIFIÉ — Style Calendrier ══════════ */}
       <Box sx={{
-        background: 'linear-gradient(135deg, #0a2e18 0%, #0f4a25 50%, #1a5e32 100%)',
-        pt: { xs: 9, md: 0 }, pb: 0,
-        position: 'relative', overflow: 'hidden',
-        // ── Même grid 55/45 que Home ──
-        display: 'grid',
-        gridTemplateColumns: { xs: '1fr', md: '55% 45%' },
-        minHeight: { md: '520px' },
+        background: 'linear-gradient(135deg, #0f4a25, #1B7A3E)',
+        py: { xs: 8, md: 11 },
+        px: 3,
+        textAlign: 'center',
       }}>
-        {/* Grille de fond */}
-        <Box sx={{
-          position: 'absolute', inset: 0,
-          backgroundImage: GRID_LINES,
-          backgroundSize: '48px 48px',
-          pointerEvents: 'none',
-        }} />
-        {/* Halo orange */}
-        <Box sx={{
-          position: 'absolute', width: 600, height: 600,
-          right: -200, top: -200, borderRadius: '50%',
-          background: 'radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }} />
-
-        {/* COLONNE GAUCHE — Chip + H1 + sous-titre */}
-        <Box sx={{
-          display: 'flex', flexDirection: 'column', justifyContent: 'center',
-          px: { xs: 3, md: 5 }, py: { xs: 10, md: 6 },
-          position: 'relative', zIndex: 1,
-        }}>
-          <Box className="cfade cfade-1" sx={{
-            display: 'inline-flex', alignItems: 'center', gap: 1,
-            mb: 3, px: 2, py: 0.55, alignSelf: 'flex-start',
-            borderRadius: '20px',
-            background: 'rgba(245,166,35,0.12)',
-            border: '1px solid rgba(245,166,35,0.3)',
-          }}>
-            <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: ORANGE, animation: 'pulse-dot 2s infinite' }} />
-            <Typography sx={{ fontSize: 11, fontWeight: 600, color: ORANGE, letterSpacing: '0.3px' }}>
-              🇨🇮 Ministère de la Femme, de la Famille et de l'Enfant
-            </Typography>
+        <Container maxWidth="md">
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+            <Box sx={{
+              width: 56, height: 56,
+              background: ORANGE,
+              borderRadius: '14px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Mail size={26} color="#0f4a25" />
+            </Box>
           </Box>
-
           <Typography
-            className="cfade cfade-2"
             variant="h1"
             sx={{
               fontFamily: "'Cormorant Garamond', serif",
-              fontSize: { xs: 40, md: 60 },
-              fontWeight: 700, color: '#fff', lineHeight: 1.0, mb: 2,
-              animation: 'fadeInUp 0.7s ease forwards',
+              fontSize: { xs: 36, md: 54 },
+              fontWeight: 700,
+              color: '#fff',
+              lineHeight: 1.1,
+              mb: 1.5,
             }}
           >
-            Contactez{' '}
-            <Box component="em" sx={{ color: ORANGE, fontStyle: 'italic' }}>le CPPE</Box>
-            <br />d'Issia
+            Contactez le CPPE d'Issia
           </Typography>
-
-          <Typography
-            className="cfade cfade-3"
-            sx={{
-              color: TEXT_MUTED, fontSize: { xs: 13, md: 14 }, lineHeight: 1.8,
-              maxWidth: 380, mb: 4,
-              borderLeft: `3px solid ${ORANGE}`, pl: 2,
-              animation: 'fadeInUp 0.7s 0.15s ease both',
-            }}
-          >
-            Notre équipe est disponible du{' '}
-            <Box component="strong" sx={{ color: ORANGE }}>lundi au vendredi de 7h30 à 16h30</Box>{' '}
-            pour répondre à toutes vos questions sur l'inscription, les sections ou la vie au CPPE.
-          </Typography>
-        </Box>
-
-        {/* COLONNE DROITE — Image identique Home */}
-        <Box sx={{
-          display: { xs: 'none', md: 'flex' },
-          alignItems: 'center', justifyContent: 'center',
-          px: 4, py: 6,
-          position: 'relative', zIndex: 1,
-        }}>
-          {/* Bordure décalée — identique Home */}
-          <Box sx={{
-            position: 'absolute',
-            width: 'calc(100% - 56px)',
-            aspectRatio: '1 / 1',
-            maxWidth: 420,
-            border: '2px solid rgba(245,166,35,0.4)',
-            borderRadius: '24px',
-            top: '50%', left: '50%',
-            transform: 'translate(calc(-50% + 10px), calc(-50% + 10px))',
-            pointerEvents: 'none',
-          }} />
-          {/* Image — identique Home */}
-          <Box sx={{
-            width: '100%', maxWidth: 420,
-            aspectRatio: '1 / 1',
-            borderRadius: '20px', overflow: 'hidden',
-            boxShadow: '0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)',
-            position: 'relative', flexShrink: 0,
+          <Typography sx={{
+            color: TEXT_MUTED,
+            fontSize: 14.5,
+            maxWidth: 560,
+            mx: 'auto',
+            lineHeight: 1.8,
           }}>
-            <Box
-              component="img"
-              src={ecoleImage}
-              alt="École CPPE Issia"
-              sx={{
-                width: '100%', height: '100%',
-                objectFit: 'cover', objectPosition: 'center',
-                display: 'block',
-                transition: 'transform 8s ease',
-                '&:hover': { transform: 'scale(1.04)' },
-              }}
-            />
-            {/* Gradient bas — identique Home */}
-            <Box sx={{
-              position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%',
-              background: 'linear-gradient(to top, rgba(10,46,24,0.7) 0%, transparent 100%)',
-              pointerEvents: 'none',
-            }} />
-            {/* Badge — identique Home */}
-            <Box sx={{
-              position: 'absolute', bottom: 18, left: 18,
-              background: 'rgba(245,166,35,0.95)',
-              backdropFilter: 'blur(8px)',
-              borderRadius: '10px', px: 1.75, py: 1,
-              display: 'flex', alignItems: 'center', gap: 1,
-            }}>
-              <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: '#0f4a25', animation: 'pulse-dot 2s infinite' }} />
-              <Typography sx={{ fontSize: 11.5, fontWeight: 800, color: '#0f4a25' }}>
-                CPPE d'Issia
-              </Typography>
-            </Box>
-          </Box>
-        </Box>
+            Notre équipe est disponible du lundi au vendredi de 7h30 à 16h30 pour répondre à toutes vos questions sur l'inscription, les sections ou la vie au CPPE.
+          </Typography>
+        </Container>
       </Box>
 
       {/* ══════════ CARTES INFO + FORMULAIRE ══════════ */}
@@ -482,7 +388,7 @@ export default function Contact() {
         </Container>
       </Box>
 
-      {/* ══════════ LOCALISATION ══════════ */}
+      {/* ══════════ CARTE GOOGLE MAPS ══════════ */}
       <Box sx={{ background: '#fff', py: { xs: 5, md: 7 } }}>
         <Container maxWidth="lg">
 
@@ -499,6 +405,7 @@ export default function Contact() {
             display: 'flex', flexDirection: { xs: 'column', md: 'row' },
             boxShadow: '0 8px 40px rgba(27,122,62,0.08)',
           }}>
+            {/* PANNEAU GAUCHE — Info */}
             <Box sx={{
               background: 'linear-gradient(160deg, #0a2e18 0%, #0f4a25 55%, #1B7A3E 100%)',
               p: { xs: 3.5, md: 4.5 },
@@ -553,43 +460,25 @@ export default function Contact() {
               </Box>
             </Box>
 
+            {/* PANNEAU DROITE — Google Maps */}
             <Box sx={{
-              flex: 1, minHeight: { xs: 220, md: 300 },
-              background: 'linear-gradient(135deg, #eaf4ee 0%, #f4f8f5 50%, #dae8df 100%)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              position: 'relative', overflow: 'hidden',
+              flex: 1,
+              minHeight: { xs: 300, md: 450 },
+              position: 'relative',
             }}>
-              <Box sx={{
-                position: 'absolute', inset: 0,
-                backgroundImage: `linear-gradient(${GREEN_MAIN}08 1px, transparent 1px), linear-gradient(90deg, ${GREEN_MAIN}08 1px, transparent 1px)`,
-                backgroundSize: '32px 32px',
-              }} />
-              <Box sx={{ position: 'relative', textAlign: 'center' }}>
-                <Box sx={{
-                  width: 64, height: 64, borderRadius: '50%',
-                  background: GREEN_CTA,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  mx: 'auto', mb: 2,
-                  boxShadow: `0 8px 28px ${GREEN_DARK}40`,
-                  position: 'relative',
-                  '&::before': {
-                    content: '""',
-                    position: 'absolute', inset: -8, borderRadius: '50%',
-                    border: `2px solid ${GREEN_MAIN}25`,
-                    animation: 'pulseRing 2.5s ease infinite',
-                  },
-                }}>
-                  <MapPin size={28} color="#fff" />
-                </Box>
-                <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 17, fontWeight: 700, color: '#0c1a10', mb: 0.4 }}>
-                  CPPE d'Issia
-                </Typography>
-                <Typography sx={{ fontSize: 12, color: '#6b7c70' }}>
-                  Haut-Sassandra, Côte d'Ivoire
-                </Typography>
-              </Box>
-              <Box sx={{ position: 'absolute', width: 180, height: 180, borderRadius: '50%', border: `1.5px dashed ${GREEN_MAIN}20`, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
-              <Box sx={{ position: 'absolute', width: 290, height: 290, borderRadius: '50%', border: `1px dashed ${GREEN_MAIN}10`, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+              <Box
+                component="iframe"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126642.71842447158!2d-6.6!3d6.5!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xf9f9f9f9f9f9f9f9%3A0x0!2sIssia%2C%20C%C3%B4te%20d&#39;Ivoire!5e0!3m2!1sfr!2sci!4v1234567890"
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  border: 'none',
+                  display: 'block',
+                }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Localisation CPPE Issia"
+              />
             </Box>
           </Box>
         </Container>

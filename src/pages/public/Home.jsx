@@ -38,6 +38,9 @@ import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import ecoleImage from '../../assets/ecole.jpg'
 
+// COULEUR ORANGE DU MINISTÈRE (remplace l'ancien jaune #F5A623)
+const ORANGE = '#FF7F27'
+
 // ========================
 // HERO
 // ========================
@@ -57,32 +60,26 @@ function Hero({ params }) {
       }}
     >
       <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)', backgroundSize: '48px 48px', pointerEvents: 'none' }} />
-      <Box sx={{ position: 'absolute', width: 600, height: 600, right: -200, top: -200, borderRadius: '50%', background: 'radial-gradient(circle, rgba(245,166,35,0.1) 0%, transparent 70%)', pointerEvents: 'none' }} />
+      <Box sx={{ position: 'absolute', width: 600, height: 600, right: -200, top: -200, borderRadius: '50%', background: `radial-gradient(circle, rgba(255,127,39,0.1) 0%, transparent 70%)`, pointerEvents: 'none' }} />
 
       {/* CONTENU GAUCHE */}
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', px: { xs: 3, md: 5 }, py: { xs: 10, md: 6 }, position: 'relative', zIndex: 1 }}>
         <Chip
           label="🇨🇮  Ministère de la Femme, de la Famille et de l'Enfant"
           size="small"
-          sx={{ mb: 3, background: 'rgba(245,166,35,0.12)', border: '1px solid rgba(245,166,35,0.3)', color: '#F5A623', fontWeight: 600, fontSize: 11, alignSelf: 'flex-start' }}
+          sx={{ mb: 3, background: `rgba(255,127,39,0.12)`, border: `1px solid rgba(255,127,39,0.3)`, color: ORANGE, fontWeight: 600, fontSize: 11, alignSelf: 'flex-start' }}
         />
         <Typography variant="h1" sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 40, md: 60 }, fontWeight: 700, color: '#fff', lineHeight: 1.0, mb: 2, animation: 'fadeInUp 0.7s ease forwards' }}>
           Centre de{' '}
-          <Box component="em" sx={{ color: '#F5A623', fontStyle: 'italic' }}>Protection</Box>
+          <Box component="em" sx={{ color: ORANGE, fontStyle: 'italic' }}>Protection</Box>
           <br />de la Petite Enfance
         </Typography>
-        <Typography sx={{ color: 'rgba(255,255,255,0.65)', fontSize: { xs: 13, md: 14 }, lineHeight: 1.8, maxWidth: 380, mb: 4, borderLeft: '3px solid #F5A623', pl: 2, animation: 'fadeInUp 0.7s 0.15s ease both' }}>
+        <Typography sx={{ color: 'rgba(255,255,255,0.65)', fontSize: { xs: 13, md: 14 }, lineHeight: 1.8, maxWidth: 380, mb: 4, borderLeft: `3px solid ${ORANGE}`, pl: 2, animation: 'fadeInUp 0.7s 0.15s ease both' }}>
           Accueil des enfants de{' '}
-          <Box component="strong" sx={{ color: '#F5A623' }}>1 an 6 mois à 5 ans</Box>{' '}
+          <Box component="strong" sx={{ color: ORANGE }}>1 an 6 mois à 5 ans</Box>{' '}
           dans le Complexe Socio-Éducatif d'Issia, Haut-Sassandra, Côte d'Ivoire.
         </Typography>
         <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', animation: 'fadeInUp 0.7s 0.3s ease both' }}>
-          {isOpen && (
-            <Button component={Link} to="/inscription" variant="contained" endIcon={<ArrowRight size={16} />}
-              sx={{ background: '#F5A623', color: '#0f4a25', fontWeight: 800, px: 3, py: 1.25, fontSize: 13, '&:hover': { background: '#e0951f', transform: 'translateY(-2px)' }, transition: 'all 0.2s' }}>
-              Dossier d'inscription {annee}
-            </Button>
-          )}
           <Button component={Link} to="/presentation" variant="outlined"
             sx={{ color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(255,255,255,0.2)', px: 3, py: 1.25, fontSize: 13, '&:hover': { background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.4)' } }}>
             Découvrir le CPPE
@@ -92,13 +89,13 @@ function Hero({ params }) {
 
       {/* IMAGE DROITE */}
       <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', justifyContent: 'center', px: 4, py: 6, position: 'relative', zIndex: 1 }}>
-        <Box sx={{ position: 'absolute', width: 'calc(100% - 56px)', aspectRatio: '1 / 1', maxWidth: 420, border: '2px solid rgba(245,166,35,0.4)', borderRadius: '24px', top: '50%', left: '50%', transform: 'translate(calc(-50% + 10px), calc(-50% + 10px))', pointerEvents: 'none' }} />
+        <Box sx={{ position: 'absolute', width: 'calc(100% - 56px)', aspectRatio: '1 / 1', maxWidth: 420, border: `2px solid rgba(255,127,39,0.4)`, borderRadius: '24px', top: '50%', left: '50%', transform: 'translate(calc(-50% + 10px), calc(-50% + 10px))', pointerEvents: 'none' }} />
         <Box sx={{ width: '100%', maxWidth: 420, aspectRatio: '1 / 1', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)', position: 'relative', flexShrink: 0 }}>
           <Box component="img" src={ecoleImage} alt="École CPPE Issia"
             sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block', transition: 'transform 8s ease', '&:hover': { transform: 'scale(1.04)' } }} />
           <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(to top, rgba(10,46,24,0.7) 0%, transparent 100%)', pointerEvents: 'none' }} />
           {isOpen && (
-            <Box sx={{ position: 'absolute', bottom: 18, left: 18, background: 'rgba(245,166,35,0.95)', backdropFilter: 'blur(8px)', borderRadius: '10px', px: 1.75, py: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box sx={{ position: 'absolute', bottom: 18, left: 18, background: `rgba(255,127,39,0.95)`, backdropFilter: 'blur(8px)', borderRadius: '10px', px: 1.75, py: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
               <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: '#0f4a25', animation: 'pulse-dot 2s infinite' }} />
               <Typography sx={{ fontSize: 11.5, fontWeight: 800, color: '#0f4a25' }}>Inscriptions {annee} ouvertes</Typography>
             </Box>
@@ -121,7 +118,7 @@ function InfoBar({ params }) {
   if (!isOpen) return null
 
   return (
-    <Box sx={{ background: '#F5A623', py: 1.25 }}>
+    <Box sx={{ background: ORANGE, py: 1.25 }}>
       <Container maxWidth="lg">
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
           <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: '#0f4a25', flexShrink: 0, animation: 'pulse-dot 2s infinite' }} />
@@ -154,11 +151,11 @@ function MotDirecteurSection({ params }) {
       <Container maxWidth="lg">
         <Box sx={{ textAlign: 'center', mb: { xs: 3, md: 5 } }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, mb: 1 }}>
-            <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
-            <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#F5A623', letterSpacing: '3px', textTransform: 'uppercase' }}>
+            <Box sx={{ width: 28, height: 2, background: ORANGE }} />
+            <Typography sx={{ fontSize: 11, fontWeight: 700, color: ORANGE, letterSpacing: '3px', textTransform: 'uppercase' }}>
               Message officiel
             </Typography>
-            <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
+            <Box sx={{ width: 28, height: 2, background: ORANGE }} />
           </Box>
           <Typography variant="h2" sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 28, md: 40 }, fontWeight: 700, color: '#0c1a10' }}>
             Mot du Directeur
@@ -193,16 +190,16 @@ function MotDirecteurSection({ params }) {
               overflow: 'hidden',
             }}
           >
-            <Box sx={{ position: 'absolute', width: 260, height: 260, borderRadius: '50%', background: 'rgba(245,166,35,0.06)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} />
-            <Box sx={{ position: 'absolute', width: 180, height: 180, borderRadius: '50%', background: 'rgba(245,166,35,0.04)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} />
+            <Box sx={{ position: 'absolute', width: 260, height: 260, borderRadius: '50%', background: `rgba(255,127,39,0.06)`, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} />
+            <Box sx={{ position: 'absolute', width: 180, height: 180, borderRadius: '50%', background: `rgba(255,127,39,0.04)`, top: '50%', left: '50%', transform: 'translate(-50%,-50%)', pointerEvents: 'none' }} />
             <Box
               sx={{
                 width: { xs: 140, md: 160 },
                 height: { xs: 140, md: 160 },
                 flexShrink: 0,
                 borderRadius: '50%',
-                border: '5px solid #F5A623',
-                boxShadow: '0 0 0 10px rgba(245,166,35,0.1), 0 12px 40px rgba(0,0,0,0.4)',
+                border: `5px solid ${ORANGE}`,
+                boxShadow: `0 0 0 10px rgba(255,127,39,0.1), 0 12px 40px rgba(0,0,0,0.4)`,
                 overflow: 'hidden',
                 background: 'rgba(255,255,255,0.08)',
                 display: 'flex',
@@ -224,9 +221,9 @@ function MotDirecteurSection({ params }) {
               <Typography sx={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', mb: 1.5 }}>
                 Directeur du CPPE d'Issia
               </Typography>
-              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, px: 1.75, py: 0.5, background: 'rgba(245,166,35,0.14)', borderRadius: '20px', border: '1px solid rgba(245,166,35,0.3)' }}>
-                <Box sx={{ width: 5, height: 5, borderRadius: '50%', background: '#F5A623' }} />
-                <Typography sx={{ fontSize: 10, color: '#F5A623', fontWeight: 700, letterSpacing: '0.5px' }}>MFFE · Côte d'Ivoire</Typography>
+              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, px: 1.75, py: 0.5, background: `rgba(255,127,39,0.14)`, borderRadius: '20px', border: `1px solid rgba(255,127,39,0.3)` }}>
+                <Box sx={{ width: 5, height: 5, borderRadius: '50%', background: ORANGE }} />
+                <Typography sx={{ fontSize: 10, color: ORANGE, fontWeight: 700, letterSpacing: '0.5px' }}>MFFE · Côte d'Ivoire</Typography>
               </Box>
             </Box>
           </Box>
@@ -247,8 +244,8 @@ function MotDirecteurSection({ params }) {
           >
             <Quote size={120} color="#1B7A3E" style={{ opacity: 0.04, position: 'absolute', top: -10, right: 10, pointerEvents: 'none' }} />
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 2.5 }}>
-              <Box sx={{ width: 28, height: 3, background: 'linear-gradient(90deg, #F5A623, #1B7A3E)', borderRadius: 2 }} />
-              <Typography sx={{ fontSize: 10, fontWeight: 700, color: '#F5A623', textTransform: 'uppercase', letterSpacing: '2px' }}>
+              <Box sx={{ width: 28, height: 3, background: `linear-gradient(90deg, ${ORANGE}, #1B7A3E)`, borderRadius: 2 }} />
+              <Typography sx={{ fontSize: 10, fontWeight: 700, color: ORANGE, textTransform: 'uppercase', letterSpacing: '2px' }}>
                 Message du directeur
               </Typography>
             </Box>
@@ -269,7 +266,7 @@ function MotDirecteurSection({ params }) {
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <Box sx={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid #F5A623', overflow: 'hidden', background: '#eaf4ee', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <Box sx={{ width: 38, height: 38, borderRadius: '50%', border: `2px solid ${ORANGE}`, overflow: 'hidden', background: '#eaf4ee', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   {photo
                     ? <Box component="img" src={photo} alt={nom} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     : <Typography sx={{ fontSize: 16 }}>👤</Typography>
@@ -309,7 +306,7 @@ function MotDirecteurSection({ params }) {
 }
 
 // ========================
-// FLASH INFOS — fond forestier chaleureux + tickers contenu uniquement
+// FLASH INFOS
 // ========================
 const FLASH_STYLES = `
   @keyframes scroll-ltr {
@@ -338,25 +335,21 @@ const FLASH_STYLES = `
 
 function FlashInfosSection({ actualites }) {
   const list    = (actualites || []).slice(0, 6)
-  // Tripliquer pour assurer la continuité du défilement
   const doubled = list.length > 0 ? [...list, ...list, ...list] : []
 
   return (
-    // ── Fond : vert forêt profond remplacé par un brun-ardoise forestier chaud ──
     <Box sx={{ background: 'linear-gradient(160deg, #1a2e1e 0%, #243b28 50%, #1e3422 100%)', py: 7, position: 'relative', overflow: 'hidden' }}>
       <style>{FLASH_STYLES}</style>
 
-      {/* Motif de fond subtil */}
-      <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(245,166,35,0.04) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(139,195,74,0.05) 0%, transparent 45%)', pointerEvents: 'none' }} />
+      <Box sx={{ position: 'absolute', inset: 0, backgroundImage: `radial-gradient(circle at 20% 50%, rgba(255,127,39,0.04) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(139,195,74,0.05) 0%, transparent 45%)`, pointerEvents: 'none' }} />
       <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)', backgroundSize: '44px 44px', pointerEvents: 'none' }} />
 
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-        {/* En-tête */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 5 }}>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-              <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
-              <Typography sx={{ fontSize: 10.5, fontWeight: 700, color: '#F5A623', letterSpacing: '3px', textTransform: 'uppercase' }}>
+              <Box sx={{ width: 28, height: 2, background: ORANGE }} />
+              <Typography sx={{ fontSize: 10.5, fontWeight: 700, color: ORANGE, letterSpacing: '3px', textTransform: 'uppercase' }}>
                 Actualités
               </Typography>
             </Box>
@@ -369,14 +362,14 @@ function FlashInfosSection({ actualites }) {
             to="/flash-infos"
             endIcon={<ChevronRight size={14} />}
             sx={{
-              color: '#F5A623',
-              border: '1px solid rgba(245,166,35,0.3)',
+              color: ORANGE,
+              border: `1px solid rgba(255,127,39,0.3)`,
               borderRadius: '20px',
               px: 2.5,
               py: 0.75,
               fontWeight: 700,
               fontSize: 12.5,
-              '&:hover': { background: 'rgba(245,166,35,0.1)', borderColor: '#F5A623' },
+              '&:hover': { background: `rgba(255,127,39,0.1)`, borderColor: ORANGE },
             }}
           >
             Toutes les infos
@@ -384,15 +377,12 @@ function FlashInfosSection({ actualites }) {
         </Box>
       </Container>
 
-      {/* ══ TICKER LIGNE 1 (gauche → droite) — contenu du message uniquement ══ */}
       {doubled.length > 0 && (
         <Box sx={{ position: 'relative', overflow: 'hidden', mb: 1.5 }}>
-          {/* Dégradés de fondu gauche/droite */}
           <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 100, background: 'linear-gradient(to right, #1a2e1e, transparent)', zIndex: 2, pointerEvents: 'none' }} />
           <Box sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 100, background: 'linear-gradient(to left, #1a2e1e, transparent)', zIndex: 2, pointerEvents: 'none' }} />
           <Box className="ticker-row-1" sx={{ gap: '10px', py: 0.5 }}>
             {doubled.map((actu, i) => {
-              // Extrait du contenu : 10 premiers mots du texte brut
               const raw     = actu.contenu?.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() || ''
               const snippet = raw.split(/\s+/).slice(0, 10).join(' ') + (raw.split(/\s+/).length > 10 ? '…' : '')
               return (
@@ -412,10 +402,10 @@ function FlashInfosSection({ actualites }) {
                     py: 0.9,
                     textDecoration: 'none',
                     transition: 'all 0.2s',
-                    '&:hover': { background: 'rgba(245,166,35,0.14)', borderColor: 'rgba(245,166,35,0.45)' },
+                    '&:hover': { background: `rgba(255,127,39,0.14)`, borderColor: `rgba(255,127,39,0.45)` },
                   }}
                 >
-                  <Box sx={{ width: 5, height: 5, borderRadius: '50%', background: '#F5A623', flexShrink: 0 }} />
+                  <Box sx={{ width: 5, height: 5, borderRadius: '50%', background: ORANGE, flexShrink: 0 }} />
                   <Typography sx={{ fontSize: 12.5, fontWeight: 500, color: 'rgba(235,248,240,0.85)', whiteSpace: 'nowrap' }}>
                     {snippet || actu.titre}
                   </Typography>
@@ -426,14 +416,12 @@ function FlashInfosSection({ actualites }) {
         </Box>
       )}
 
-      {/* ══ TICKER LIGNE 2 (droite → gauche) — contenu mots 10-20 ══ */}
       {doubled.length > 0 && (
         <Box sx={{ position: 'relative', overflow: 'hidden', mb: 5 }}>
           <Box sx={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 100, background: 'linear-gradient(to right, #243b28, transparent)', zIndex: 2, pointerEvents: 'none' }} />
           <Box sx={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 100, background: 'linear-gradient(to left, #243b28, transparent)', zIndex: 2, pointerEvents: 'none' }} />
           <Box className="ticker-row-2" sx={{ gap: '10px', py: 0.5 }}>
             {doubled.map((actu, i) => {
-              // Suite du contenu : mots 10 à 22
               const raw   = actu.contenu?.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim() || ''
               const words = raw.split(/\s+/)
               const slice = words.slice(10, 22).join(' ')
@@ -471,18 +459,16 @@ function FlashInfosSection({ actualites }) {
         </Box>
       )}
 
-      {/* ══ CARTES 3 premières actus ══ */}
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <Grid container spacing={2}>
           {list.slice(0, 3).map((actu, i) => {
             const raw     = actu.contenu?.replace(/<[^>]+>/g, '') || ''
             const excerpt = raw.trim().split(/\s+/).slice(0, 18).join(' ') + (raw.split(/\s+/).length > 18 ? '…' : '')
-            const accent  = i === 0 ? '#F5A623' : i === 1 ? '#8bc34a' : '#4db6ac'
+            const accent  = i === 0 ? ORANGE : i === 1 ? '#8bc34a' : '#4db6ac'
             return (
               <Grid item xs={12} md={4} key={actu.id}>
                 <Box
                   component={Link}
-                  // ← Lien vers l'article précis
                   to={`/flash-infos?id=${actu.id}`}
                   sx={{
                     display: 'flex',
@@ -504,33 +490,22 @@ function FlashInfosSection({ actualites }) {
                     },
                   }}
                 >
-                  {/* Bande colorée en haut */}
                   <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, ${accent}, transparent)` }} />
-
-                  {/* Numéro déco */}
                   <Typography sx={{ position: 'absolute', bottom: -8, right: 12, fontFamily: "'Cormorant Garamond', serif", fontSize: 80, fontWeight: 700, color: 'rgba(255,255,255,0.025)', lineHeight: 1, userSelect: 'none' }}>
                     {String(i + 1).padStart(2, '0')}
                   </Typography>
-
-                  {/* Date */}
                   <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, mb: 2, alignSelf: 'flex-start', px: 1.5, py: 0.4, background: `${accent}18`, borderRadius: '20px', border: `1px solid ${accent}30` }}>
                     <Box sx={{ width: 5, height: 5, borderRadius: '50%', background: accent, flexShrink: 0 }} />
                     <Typography sx={{ fontSize: 10.5, color: accent, fontWeight: 700 }}>
                       {actu.date_publication ? format(new Date(actu.date_publication), 'dd MMM yyyy', { locale: fr }) : '—'}
                     </Typography>
                   </Box>
-
-                  {/* Titre */}
                   <Typography sx={{ fontWeight: 700, fontSize: 15, color: '#f0f7f2', mb: 1.5, lineHeight: 1.4, position: 'relative' }}>
                     {actu.titre}
                   </Typography>
-
-                  {/* Extrait */}
                   <Typography sx={{ fontSize: 12.5, color: 'rgba(200,235,210,0.5)', lineHeight: 1.75, flex: 1, position: 'relative' }}>
                     {excerpt}
                   </Typography>
-
-                  {/* Footer */}
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mt: 2.5, pt: 2, borderTop: '1px solid rgba(255,255,255,0.07)' }}>
                     <Typography sx={{ fontSize: 12, fontWeight: 700, color: accent }}>Lire la suite</Typography>
                     <ChevronRight size={13} color={accent} />
@@ -547,15 +522,15 @@ function FlashInfosSection({ actualites }) {
             to="/flash-infos"
             endIcon={<ChevronRight size={14} />}
             sx={{
-              background: 'rgba(245,166,35,0.1)',
-              border: '1px solid rgba(245,166,35,0.3)',
-              color: '#F5A623',
+              background: `rgba(255,127,39,0.1)`,
+              border: `1px solid rgba(255,127,39,0.3)`,
+              color: ORANGE,
               fontWeight: 700,
               fontSize: 13,
               borderRadius: '30px',
               px: 3.5,
               py: 1,
-              '&:hover': { background: 'rgba(245,166,35,0.2)', borderColor: '#F5A623' },
+              '&:hover': { background: `rgba(255,127,39,0.2)`, borderColor: ORANGE },
             }}
           >
             Voir toutes les actualités
@@ -567,7 +542,7 @@ function FlashInfosSection({ actualites }) {
 }
 
 // ========================
-// SECTIONS
+// SECTIONS — CENTRÉ + TEXTE AGRANDI
 // ========================
 const SECTIONS_DATA = [
   {
@@ -597,8 +572,8 @@ const SECTIONS_DATA = [
     age: '3 ans — 3 ans 11 mois',
     href: '/sections/petite-section',
     color: '#fff8ee',
-    accent: '#F5A623',
-    darkAccent: '#b87b0f',
+    accent: ORANGE,
+    darkAccent: '#cc6400',
     desc: 'Langage oral, dessin et premières découvertes collectives pour les tout-petits.',
     tags: ['Langage oral', 'Dessin', 'Socialisation'],
     num: '40',
@@ -659,21 +634,22 @@ function SectionsSection() {
       <Container maxWidth="lg">
         <Box sx={{ textAlign: 'center', mb: 6 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, mb: 1.5 }}>
-            <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
-            <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#F5A623', letterSpacing: '3px', textTransform: 'uppercase' }}>Pédagogie</Typography>
-            <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
+            <Box sx={{ width: 28, height: 2, background: ORANGE }} />
+            <Typography sx={{ fontSize: 11, fontWeight: 700, color: ORANGE, letterSpacing: '3px', textTransform: 'uppercase' }}>Pédagogie</Typography>
+            <Box sx={{ width: 28, height: 2, background: ORANGE }} />
           </Box>
           <Typography variant="h2" sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 30, md: 44 }, fontWeight: 700, color: '#0c1a10', mb: 1 }}>
             Nos 4 sections
           </Typography>
-          <Typography sx={{ color: '#6b7c70', fontSize: 14, maxWidth: 560, mx: 'auto', lineHeight: 1.85 }}>
+          <Typography sx={{ color: '#6b7c70', fontSize: 15, maxWidth: 560, mx: 'auto', lineHeight: 1.85 }}>
             Un accompagnement adapté à chaque étape de{' '}
             <Box component="strong" sx={{ color: '#1B7A3E' }}>1 an 6 mois à 5 ans</Box>.
             {' '}Le goûter et la tenue de sport sont <Box component="strong" sx={{ color: '#1B7A3E' }}>inclus dans la scolarité</Box>.
           </Typography>
         </Box>
 
-        <Grid container spacing={2.5}>
+        {/* GRID CENTRÉ */}
+        <Grid container spacing={2.5} justifyContent="center">
           {SECTIONS_DATA.map((sec, idx) => {
             const Icon       = sec.icon
             const isExpanded = openFournitures === idx
@@ -703,19 +679,19 @@ function SectionsSection() {
                         <Icon size={24} color="#fff" />
                       </Box>
                       <Box sx={{ textAlign: 'right' }}>
-                        <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 28, fontWeight: 700, color: sec.accent, lineHeight: 1 }}>{sec.num}</Typography>
-                        <Typography sx={{ fontSize: 9.5, color: `${sec.accent}99`, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{sec.numLabel}</Typography>
+                        <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 30, fontWeight: 700, color: sec.accent, lineHeight: 1 }}>{sec.num}</Typography>
+                        <Typography sx={{ fontSize: 10, color: `${sec.accent}99`, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{sec.numLabel}</Typography>
                       </Box>
                     </Box>
-                    <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 17, md: 20 }, fontWeight: 700, color: '#0c1a10', lineHeight: 1.15 }}>{sec.label}</Typography>
-                    <Typography sx={{ fontSize: 9.5, color: `${sec.accent}88`, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', mb: 0.75 }}>{sec.sublabel}</Typography>
+                    <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 19, md: 22 }, fontWeight: 700, color: '#0c1a10', lineHeight: 1.15 }}>{sec.label}</Typography>
+                    <Typography sx={{ fontSize: 10.5, color: `${sec.accent}88`, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', mb: 0.75 }}>{sec.sublabel}</Typography>
                     <Chip label={sec.age} size="small"
-                      sx={{ alignSelf: 'flex-start', mb: 1.5, background: `${sec.accent}14`, color: sec.accent, fontWeight: 700, fontSize: 9.5, border: `1px solid ${sec.accent}30`, height: 20 }} />
-                    <Typography sx={{ fontSize: 12.5, color: '#6b7c70', lineHeight: 1.75, mb: 1.5, flex: 1 }}>{sec.desc}</Typography>
+                      sx={{ alignSelf: 'flex-start', mb: 1.5, background: `${sec.accent}14`, color: sec.accent, fontWeight: 700, fontSize: 10, border: `1px solid ${sec.accent}30`, height: 22 }} />
+                    <Typography sx={{ fontSize: 13.5, color: '#6b7c70', lineHeight: 1.75, mb: 1.5, flex: 1 }}>{sec.desc}</Typography>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 1.5 }}>
                       {sec.tags.map((tag) => (
                         <Box key={tag} sx={{ px: 1.25, py: 0.3, borderRadius: '20px', background: `${sec.accent}10`, border: `1px solid ${sec.accent}20` }}>
-                          <Typography sx={{ fontSize: 10, color: sec.darkAccent, fontWeight: 600 }}>{tag}</Typography>
+                          <Typography sx={{ fontSize: 10.5, color: sec.darkAccent, fontWeight: 600 }}>{tag}</Typography>
                         </Box>
                       ))}
                     </Box>
@@ -725,7 +701,7 @@ function SectionsSection() {
                         sx={{ display: 'flex', alignItems: 'center', gap: 0.75, cursor: 'pointer', userSelect: 'none' }}
                       >
                         <Package size={13} color={sec.accent} />
-                        <Typography sx={{ fontSize: 11.5, fontWeight: 700, color: sec.accent, flex: 1 }}>Fournitures</Typography>
+                        <Typography sx={{ fontSize: 12, fontWeight: 700, color: sec.accent, flex: 1 }}>Fournitures</Typography>
                         <ChevronRight size={12} color={sec.accent}
                           style={{ transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
                       </Box>
@@ -734,7 +710,7 @@ function SectionsSection() {
                           {sec.fournitures.map((f) => (
                             <Box key={f} sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75 }}>
                               <Box sx={{ width: 5, height: 5, borderRadius: '50%', background: sec.accent, mt: 0.7, flexShrink: 0 }} />
-                              <Typography sx={{ fontSize: 11, color: '#4b5e52', lineHeight: 1.5 }}>{f}</Typography>
+                              <Typography sx={{ fontSize: 11.5, color: '#4b5e52', lineHeight: 1.5 }}>{f}</Typography>
                             </Box>
                           ))}
                         </Box>
@@ -742,7 +718,7 @@ function SectionsSection() {
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pt: 1.5, borderTop: `1px solid ${sec.accent}12` }}>
                       <Link to={sec.href} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 6 }}>
-                        <Typography sx={{ fontSize: 12, fontWeight: 700, color: sec.accent }}>Découvrir</Typography>
+                        <Typography sx={{ fontSize: 13, fontWeight: 700, color: sec.accent }}>Découvrir</Typography>
                         <Box sx={{ width: 26, height: 26, borderRadius: '50%', background: `linear-gradient(135deg, ${sec.accent}, ${sec.darkAccent})`, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 3px 10px ${sec.accent}30` }}>
                           <ChevronRight size={13} color="#fff" />
                         </Box>
@@ -757,7 +733,7 @@ function SectionsSection() {
 
         <Box sx={{ mt: 3, p: 2, background: '#f4f8f5', border: '1px solid #dae8df', borderRadius: '12px', display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
           <Shirt size={16} color="#1B7A3E" style={{ flexShrink: 0, marginTop: 2 }} />
-          <Typography sx={{ fontSize: 12.5, color: '#4b5e52', lineHeight: 1.75 }}>
+          <Typography sx={{ fontSize: 13, color: '#4b5e52', lineHeight: 1.75 }}>
             <strong>Tenue scolaire :</strong> Vert / blanc petit carreau — à l'actif des parents.&ensp;·&ensp;
             <strong>Goûter &amp; tenue de sport</strong> inclus dans la scolarité.&ensp;·&ensp;
             <strong>Transport :</strong> taximètres disponibles sur demande.
@@ -770,85 +746,6 @@ function SectionsSection() {
             Explorer toutes nos sections
           </Button>
         </Box>
-      </Container>
-    </Box>
-  )
-}
-
-// ========================
-// STATS CARROUSEL
-// ========================
-function StatsCarousel({ params }) {
-  const montant = params?.scolarite_montant
-    ? Number(params.scolarite_montant).toLocaleString('fr-FR')
-    : '50 000'
-
-  const stats = [
-    { num: '+200',       label: 'Enfants accueillis',  icon: Users,       color: '#1B7A3E', bg: '#eaf4ee' },
-    { num: '4',          label: 'Sections éducatives', icon: Calendar,    color: '#1565c0', bg: '#dbeafe' },
-    { num: `${montant}`, label: 'FCFA / Scolarité',    icon: CheckCircle, color: '#b87b0f', bg: '#fff3e0' },
-  ]
-
-  const [current, setCurrent] = useState(0)
-  const [paused,  setPaused]  = useState(false)
-  const intervalRef = useRef(null)
-
-  const startAuto = () => { intervalRef.current = setInterval(() => setCurrent((p) => (p + 1) % stats.length), 2800) }
-  useEffect(() => { if (!paused) startAuto(); return () => clearInterval(intervalRef.current) }, [paused])
-  const goTo = (idx) => { setCurrent(idx); clearInterval(intervalRef.current); if (!paused) startAuto() }
-  const prev = () => goTo((current - 1 + stats.length) % stats.length)
-  const next = () => goTo((current + 1) % stats.length)
-
-  return (
-    <Box sx={{ py: 7, background: '#f4f8f5' }} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-      <Container maxWidth="sm">
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, mb: 1 }}>
-            <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
-            <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#F5A623', letterSpacing: '3px', textTransform: 'uppercase' }}>Nos chiffres</Typography>
-            <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
-          </Box>
-          <Typography variant="h3" sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 28, md: 36 }, fontWeight: 700, color: '#0c1a10' }}>Notre impact en chiffres</Typography>
-        </Box>
-
-        <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
-          <IconButton onClick={prev} sx={{ bgcolor: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', border: '1px solid #dae8df', '&:hover': { bgcolor: '#f4f8f5', transform: 'scale(1.05)' }, transition: 'all 0.15s', flexShrink: 0 }}>
-            <ChevronLeft size={18} color="#1B7A3E" />
-          </IconButton>
-          <Box sx={{ flex: 1, overflow: 'hidden', borderRadius: '20px' }}>
-            <Box sx={{ display: 'flex', transition: 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)', transform: `translateX(-${current * 100}%)` }}>
-              {stats.map((stat, idx) => {
-                const Icon = stat.icon
-                return (
-                  <Box key={idx} sx={{ flex: '0 0 100%', px: 1 }}>
-                    <Box sx={{ background: '#fff', border: `1px solid ${stat.color}22`, borderRadius: '20px', p: { xs: 4, md: 5 }, textAlign: 'center', boxShadow: `0 8px 32px ${stat.color}12`, position: 'relative', overflow: 'hidden' }}>
-                      <Box sx={{ position: 'absolute', width: 160, height: 160, right: -40, bottom: -40, borderRadius: '50%', background: stat.bg, opacity: 0.5, pointerEvents: 'none' }} />
-                      <Box sx={{ width: 56, height: 56, borderRadius: '16px', background: stat.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 2.5, position: 'relative' }}>
-                        <Icon size={24} color={stat.color} />
-                      </Box>
-                      <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 58, md: 72 }, fontWeight: 700, color: stat.color, lineHeight: 1, mb: 1, position: 'relative' }}>
-                        {stat.num}
-                      </Typography>
-                      <Typography sx={{ fontSize: 14, color: '#6b7c70', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', position: 'relative' }}>
-                        {stat.label}
-                      </Typography>
-                    </Box>
-                  </Box>
-                )
-              })}
-            </Box>
-          </Box>
-          <IconButton onClick={next} sx={{ bgcolor: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', border: '1px solid #dae8df', '&:hover': { bgcolor: '#f4f8f5', transform: 'scale(1.05)' }, transition: 'all 0.15s', flexShrink: 0 }}>
-            <ChevronRightIcon size={18} color="#1B7A3E" />
-          </IconButton>
-        </Box>
-
-        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 3 }}>
-          {stats.map((_, idx) => (
-            <Box key={idx} onClick={() => goTo(idx)} sx={{ height: 6, borderRadius: '3px', bgcolor: idx === current ? '#1B7A3E' : '#dae8df', width: idx === current ? 28 : 8, cursor: 'pointer', transition: 'all 0.3s ease' }} />
-          ))}
-        </Box>
-        {paused && <Box sx={{ textAlign: 'center', mt: 1.5 }}><Typography sx={{ fontSize: 10.5, color: '#9ca3af', fontStyle: 'italic' }}>Défilement en pause</Typography></Box>}
       </Container>
     </Box>
   )
@@ -885,11 +782,11 @@ function InscriptionCTA({ params }) {
       <Container maxWidth="lg">
         <Box sx={{ textAlign: 'center', mb: 6 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, mb: 1 }}>
-            <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
-            <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#F5A623', letterSpacing: '3px', textTransform: 'uppercase' }}>
+            <Box sx={{ width: 28, height: 2, background: ORANGE }} />
+            <Typography sx={{ fontSize: 11, fontWeight: 700, color: ORANGE, letterSpacing: '3px', textTransform: 'uppercase' }}>
               {isOpen ? 'Inscriptions ouvertes' : "Dossier d'inscription"}
             </Typography>
-            <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
+            <Box sx={{ width: 28, height: 2, background: ORANGE }} />
           </Box>
           <Typography variant="h2" sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 30, md: 44 }, fontWeight: 700, color: '#fff', lineHeight: 1.1, mb: 1 }}>
             {isOpen ? `Inscrivez votre enfant — ${annee}` : 'Préparez votre dossier'}
@@ -902,18 +799,17 @@ function InscriptionCTA({ params }) {
         </Box>
 
         <Grid container spacing={2.5}>
-          {/* Pièces à fournir */}
           <Grid item xs={12} md={4}>
             <Box sx={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', p: 3, height: '100%' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 2.5 }}>
-                <Box sx={{ width: 32, height: 32, borderRadius: '10px', background: 'rgba(245,166,35,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <ShieldCheck size={16} color="#F5A623" />
+                <Box sx={{ width: 32, height: 32, borderRadius: '10px', background: `rgba(255,127,39,0.15)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <ShieldCheck size={16} color={ORANGE} />
                 </Box>
-                <Typography sx={{ color: '#F5A623', fontWeight: 700, fontSize: 12.5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pièces à fournir</Typography>
+                <Typography sx={{ color: ORANGE, fontWeight: 700, fontSize: 12.5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pièces à fournir</Typography>
               </Box>
               {dossier.map((item) => (
                 <Box key={item.label} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25, mb: 2 }}>
-                  <CheckCircle size={15} color="#F5A623" style={{ flexShrink: 0, marginTop: 2 }} />
+                  <CheckCircle size={15} color={ORANGE} style={{ flexShrink: 0, marginTop: 2 }} />
                   <Box>
                     <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>{item.label}</Typography>
                     <Typography sx={{ color: 'rgba(255,255,255,0.42)', fontSize: 11.5, lineHeight: 1.55, mt: 0.25 }}>{item.detail}</Typography>
@@ -923,18 +819,17 @@ function InscriptionCTA({ params }) {
             </Box>
           </Grid>
 
-          {/* Scolarité & versements */}
           <Grid item xs={12} md={4}>
             <Box sx={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', p: 3, height: '100%' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 2.5 }}>
-                <Box sx={{ width: 32, height: 32, borderRadius: '10px', background: 'rgba(245,166,35,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <CreditCard size={16} color="#F5A623" />
+                <Box sx={{ width: 32, height: 32, borderRadius: '10px', background: `rgba(255,127,39,0.15)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <CreditCard size={16} color={ORANGE} />
                 </Box>
-                <Typography sx={{ color: '#F5A623', fontWeight: 700, fontSize: 12.5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Scolarité {annee}</Typography>
+                <Typography sx={{ color: ORANGE, fontWeight: 700, fontSize: 12.5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Scolarité {annee}</Typography>
               </Box>
-              <Box sx={{ mb: 2.5, p: 2, background: 'rgba(245,166,35,0.08)', borderRadius: '12px', border: '1px solid rgba(245,166,35,0.2)' }}>
+              <Box sx={{ mb: 2.5, p: 2, background: `rgba(255,127,39,0.08)`, borderRadius: '12px', border: `1px solid rgba(255,127,39,0.2)` }}>
                 <Typography sx={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, mb: 0.25 }}>Montant annuel</Typography>
-                <Typography sx={{ color: '#F5A623', fontWeight: 800, fontSize: 24, lineHeight: 1 }}>{montant} FCFA</Typography>
+                <Typography sx={{ color: ORANGE, fontWeight: 800, fontSize: 24, lineHeight: 1 }}>{montant} FCFA</Typography>
                 <Typography sx={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, mt: 0.5 }}>+ 6 000 F (fêtes scolaires &amp; photos)</Typography>
               </Box>
               {versements.map((v, i) => (
@@ -943,20 +838,19 @@ function InscriptionCTA({ params }) {
                     <Typography sx={{ color: 'rgba(255,255,255,0.85)', fontSize: 12.5, fontWeight: 600 }}>{v.label}</Typography>
                     <Typography sx={{ color: 'rgba(255,255,255,0.38)', fontSize: 11 }}>{v.moment}</Typography>
                   </Box>
-                  <Typography sx={{ color: '#F5A623', fontWeight: 700, fontSize: 13, flexShrink: 0, ml: 1 }}>{v.montant}</Typography>
+                  <Typography sx={{ color: ORANGE, fontWeight: 700, fontSize: 13, flexShrink: 0, ml: 1 }}>{v.montant}</Typography>
                 </Box>
               ))}
             </Box>
           </Grid>
 
-          {/* Infos pratiques */}
           <Grid item xs={12} md={4}>
             <Box sx={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', p: 3, height: '100%', display: 'flex', flexDirection: 'column' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 2.5 }}>
-                <Box sx={{ width: 32, height: 32, borderRadius: '10px', background: 'rgba(245,166,35,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Package size={16} color="#F5A623" />
+                <Box sx={{ width: 32, height: 32, borderRadius: '10px', background: `rgba(255,127,39,0.15)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Package size={16} color={ORANGE} />
                 </Box>
-                <Typography sx={{ color: '#F5A623', fontWeight: 700, fontSize: 12.5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Infos pratiques</Typography>
+                <Typography sx={{ color: ORANGE, fontWeight: 700, fontSize: 12.5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Infos pratiques</Typography>
               </Box>
               {[
                 { icon: Utensils,    label: 'Cantine scolaire',          detail: 'Facultative · 8 000 Frs / mois' },
@@ -977,7 +871,7 @@ function InscriptionCTA({ params }) {
               {isOpen && (
                 <Box sx={{ mt: 'auto', pt: 2 }}>
                   <Button component={Link} to="/inscription" variant="contained" fullWidth endIcon={<ArrowRight size={15} />}
-                    sx={{ background: '#F5A623', color: '#0f4a25', fontWeight: 800, py: 1.25, fontSize: 13, '&:hover': { background: '#e0951f' } }}>
+                    sx={{ background: ORANGE, color: '#0f4a25', fontWeight: 800, py: 1.25, fontSize: 13, '&:hover': { background: '#e66e00' } }}>
                     Constituer mon dossier
                   </Button>
                 </Box>
@@ -1000,7 +894,7 @@ function ContactRapide({ params }) {
 
   const infos = [
     { icon: MapPin, title: 'Adresse',   text: adresse,   color: '#1B7A3E' },
-    { icon: Phone,  title: 'Téléphone', text: telephone, color: '#F5A623' },
+    { icon: Phone,  title: 'Téléphone', text: telephone, color: ORANGE },
     { icon: Clock,  title: 'Horaires',  text: horaires,  color: '#1B7A3E' },
   ]
 
@@ -1050,7 +944,6 @@ export default function Home() {
       <MotDirecteurSection params={params} />
       <FlashInfosSection   actualites={actualites} />
       <SectionsSection />
-      <StatsCarousel       params={params} />
       <InscriptionCTA      params={params} />
       <ContactRapide       params={params} />
     </Box>
