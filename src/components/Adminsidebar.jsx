@@ -32,7 +32,6 @@ const MENU = [
     items: [
       { label: 'Flash Infos',    href: '/admin/actualites', icon: Newspaper },
       { label: 'Activités',      href: '/admin/activites',  icon: Drama },
-      { label: 'Galerie Médias', href: '/admin/galerie',    icon: Image },
       { label: 'Calendrier',     href: '/admin/calendrier', icon: CalendarDays },
     ],
   },

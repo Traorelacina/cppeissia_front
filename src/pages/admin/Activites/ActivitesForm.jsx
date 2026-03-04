@@ -78,7 +78,6 @@ export default function ActivitesForm() {
     defaultValues: {
       titre: '',
       description: '',
-      section: 'toutes',
       date_activite: '',
       publie: false,
     },
@@ -100,20 +99,20 @@ export default function ActivitesForm() {
     onError: () => toast.error('Erreur lors de la sauvegarde.'),
   })
 
- const onSubmit = (data) => {
-  const formData = new FormData();
-  Object.entries(data).forEach(([k, v]) => {
-    if (k === 'publie') {
-      // Convertir le booléen en '1' ou '0'
-      formData.append(k, v ? '1' : '0');
-    } else {
-      formData.append(k, v);
-    }
-  });
-  photos.forEach((f) => formData.append('photos[]', f));
-  if (isEditing) formData.append('_method', 'PUT');
-  mutation.mutate(formData);
-};
+  const onSubmit = (data) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([k, v]) => {
+      if (k === 'publie') {
+        // Convertir le booléen en '1' ou '0'
+        formData.append(k, v ? '1' : '0');
+      } else {
+        formData.append(k, v);
+      }
+    });
+    photos.forEach((f) => formData.append('photos[]', f));
+    if (isEditing) formData.append('_method', 'PUT');
+    mutation.mutate(formData);
+  };
 
   return (
     <Box>
@@ -235,24 +234,6 @@ export default function ActivitesForm() {
               <Typography sx={{ fontWeight: 700, fontSize: 13, mb: 2.5, pb: 1.5, borderBottom: '1px solid #dae8df' }}>
                 Paramètres
               </Typography>
-
-              {/* ✅ Select avec Controller pour éviter la valeur undefined */}
-              <Controller
-                name="section"
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth size="small" sx={{ mb: 2.5 }}>
-                    <InputLabel>Section</InputLabel>
-                    <Select label="Section" value={field.value} onChange={field.onChange}>
-                      <MenuItem value="toutes">Toutes les sections</MenuItem>
-                      <MenuItem value="creche">Crèche</MenuItem>
-                      <MenuItem value="ps">Petite Section</MenuItem>
-                      <MenuItem value="ms">Moyenne Section</MenuItem>
-                      <MenuItem value="gs">Grande Section</MenuItem>
-                    </Select>
-                  </FormControl>
-                )}
-              />
 
               <TextField
                 label="Date de l'activité"

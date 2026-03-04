@@ -77,7 +77,6 @@ export default function ActivitesList() {
             <TableHead>
               <TableRow sx={{ background: '#f9fbf9' }}>
                 <TableCell>Titre</TableCell>
-                <TableCell>Section</TableCell>
                 <TableCell>Date activité</TableCell>
                 <TableCell>Photos</TableCell>
                 <TableCell>Publié</TableCell>
@@ -91,11 +90,6 @@ export default function ActivitesList() {
                     <Typography sx={{ fontWeight: 600, fontSize: 13, maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {actu.titre}
                     </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'inline-block', px: 1, py: 0.3, borderRadius: '4px', fontSize: 10, fontWeight: 700, background: '#eaf4ee', color: '#1B7A3E', textTransform: 'uppercase' }}>
-                      {actu.section}
-                    </Box>
                   </TableCell>
                   <TableCell sx={{ fontSize: 12.5, color: '#6b7c70' }}>
                     {actu.date_activite ? format(new Date(actu.date_activite), 'dd MMM yyyy', { locale: fr }) : '—'}

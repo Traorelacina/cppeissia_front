@@ -94,9 +94,7 @@ function RichTextarea({ value, onChange, hasError, placeholder }) {
 
 const TYPES = [
   { value: 'flash',       label: 'Flash Info' },
-  { value: 'convocation', label: 'Convocation Parents' },
-  { value: 'evenement',   label: 'Événement' },
-  { value: 'inscription', label: 'Inscription' },
+
 ]
 
 export default function ActualitesForm() {
