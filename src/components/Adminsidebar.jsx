@@ -17,6 +17,9 @@ import { useAuth } from '@/contexts/AuthContext'
 
 export const DRAWER_WIDTH = 240
 
+// Variable pour contrôler la visibilité d'Inscriptions
+const SHOW_INSCRIPTIONS = false // Mettre à false pour cacher, true pour afficher
+
 const MENU = [
   {
     section: 'Tableau de bord',
@@ -36,7 +39,8 @@ const MENU = [
   {
     section: 'Gestion',
     items: [
-      { label: 'Inscriptions', href: '/admin/inscriptions', icon: ClipboardList },
+      // L'élément Inscriptions est conditionné par SHOW_INSCRIPTIONS
+      ...(SHOW_INSCRIPTIONS ? [{ label: 'Inscriptions', href: '/admin/inscriptions', icon: ClipboardList }] : []),
       { label: 'Messages',     href: '/admin/messages',           icon: MessageSquare },
     ],
   },
@@ -148,61 +152,66 @@ function SidebarContent() {
       <Box sx={{ flex: 1, overflowY: 'auto', pb: 2 }}>
         {MENU.map((group) => (
           <Box key={group.section} sx={{ mb: 1 }}>
-            <Box
-              sx={{
-                px: 2,
-                py: 0.75,
-                fontSize: 9,
-                fontWeight: 700,
-                color: 'rgba(255,255,255,0.2)',
-                letterSpacing: '2px',
-                textTransform: 'uppercase',
-              }}
-            >
-              {group.section}
-            </Box>
-
-            {group.items.map((item) => {
-              const isLocked = item.superAdmin && !isSuperAdmin?.()
-              const Icon = item.icon
-
-              if (isLocked) {
-                return (
-                  <Tooltip key={item.href} title="Accès Super Admin uniquement" placement="right">
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1.5,
-                        px: 2,
-                        py: 1.1,
-                        fontSize: 12.5,
-                        color: 'rgba(255,255,255,0.2)',
-                        cursor: 'not-allowed',
-                        mr: 1,
-                      }}
-                    >
-                      <Lock size={14} />
-                      <span>{item.label}</span>
-                    </Box>
-                  </Tooltip>
-                )
-              }
-
-              return (
-                <NavLink
-                  key={item.href}
-                  to={item.href}
-                  end
-                  className={({ isActive }) =>
-                    `admin-sidebar-item${isActive ? ' active' : ''}`
-                  }
+            {/* Ne pas afficher la section si elle ne contient aucun élément visible */}
+            {group.items.length > 0 && (
+              <>
+                <Box
+                  sx={{
+                    px: 2,
+                    py: 0.75,
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: 'rgba(255,255,255,0.2)',
+                    letterSpacing: '2px',
+                    textTransform: 'uppercase',
+                  }}
                 >
-                  <Icon size={15} strokeWidth={2} />
-                  <span>{item.label}</span>
-                </NavLink>
-              )
-            })}
+                  {group.section}
+                </Box>
+
+                {group.items.map((item) => {
+                  const isLocked = item.superAdmin && !isSuperAdmin?.()
+                  const Icon = item.icon
+
+                  if (isLocked) {
+                    return (
+                      <Tooltip key={item.href} title="Accès Super Admin uniquement" placement="right">
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5,
+                            px: 2,
+                            py: 1.1,
+                            fontSize: 12.5,
+                            color: 'rgba(255,255,255,0.2)',
+                            cursor: 'not-allowed',
+                            mr: 1,
+                          }}
+                        >
+                          <Lock size={14} />
+                          <span>{item.label}</span>
+                        </Box>
+                      </Tooltip>
+                    )
+                  }
+
+                  return (
+                    <NavLink
+                      key={item.href}
+                      to={item.href}
+                      end
+                      className={({ isActive }) =>
+                        `admin-sidebar-item${isActive ? ' active' : ''}`
+                      }
+                    >
+                      <Icon size={15} strokeWidth={2} />
+                      <span>{item.label}</span>
+                    </NavLink>
+                  )
+                })}
+              </>
+            )}
           </Box>
         ))}
       </Box>
