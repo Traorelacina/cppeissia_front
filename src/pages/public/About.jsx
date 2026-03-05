@@ -112,7 +112,7 @@ export function About() {
                       </Typography>
                     </Box>
                   </Box>
-                  <Box sx={{ position: 'absolute', top: 16, right: 16, background: `rgba(255,127,39,0.95)`, backdropFilter: 'blur(8px)', borderRadius: '12px', px: 1.5, py: 0.75, zIndex: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+                  <Box sx={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,127,39,0.95)', backdropFilter: 'blur(8px)', borderRadius: '12px', px: 1.5, py: 0.75, zIndex: 3, boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
                     <Typography sx={{ fontSize: 13, fontWeight: 800, color: '#0a3a1e' }}>CPPE Issia</Typography>
                   </Box>
                 </Box>
@@ -127,23 +127,24 @@ export function About() {
         <Container maxWidth="lg">
           <SectionHeader eyebrow="Nos valeurs" title="Ce qui nous guide" centered />
 
+          {/* xs={3} → 4 cartes sur une seule ligne sur tous les appareils */}
           <Grid container spacing={3} sx={{ mt: 3 }}>
             {valeurs.map(({ icon: Icon, titre, texte }, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
+              <Grid item xs={3} key={index}>
                 <Box sx={{
-                  background: '#fff', borderRadius: '24px', p: 4, height: '100%',
+                  background: '#fff', borderRadius: '24px', p: { xs: 2, md: 4 }, height: '100%',
                   border: '1px solid #e0ebe4', transition: 'all 0.4s ease',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
                   boxShadow: '0 8px 24px rgba(0,0,0,0.04)',
                   '&:hover': { transform: 'translateY(-10px)', boxShadow: '0 20px 40px rgba(27,122,62,0.2)', borderColor: '#1B7A3E' },
                 }}>
-                  <Box sx={{ width: 72, height: 72, borderRadius: '20px', background: 'linear-gradient(135deg, #e8f3ec, #d4e8dc)', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 3 }}>
-                    <Icon size={34} color="#1B7A3E" strokeWidth={1.5} />
+                  <Box sx={{ width: { xs: 52, md: 72 }, height: { xs: 52, md: 72 }, borderRadius: '20px', background: 'linear-gradient(135deg, #e8f3ec, #d4e8dc)', display: 'flex', alignItems: 'center', justifyContent: 'center', mb: { xs: 1.5, md: 3 }, flexShrink: 0 }}>
+                    <Icon size={28} color="#1B7A3E" strokeWidth={1.5} />
                   </Box>
-                  <Typography sx={{ fontWeight: 700, fontSize: 22, color: '#1a2e20', mb: 1.5, fontFamily: "'Cormorant Garamond', serif" }}>
+                  <Typography sx={{ fontWeight: 700, fontSize: { xs: 15, md: 22 }, color: '#1a2e20', mb: { xs: 1, md: 1.5 }, fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.2 }}>
                     {titre}
                   </Typography>
-                  <Typography sx={{ fontSize: 16, color: '#4a6b55', lineHeight: 1.7, maxWidth: 220, mx: 'auto' }}>
+                  <Typography sx={{ fontSize: { xs: 12, md: 16 }, color: '#4a6b55', lineHeight: 1.7 }}>
                     {texte}
                   </Typography>
                 </Box>
