@@ -1,6 +1,6 @@
 import { Box, Container, Grid, Typography, Chip, Paper, Divider } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
-import { calendrierApi } from '@/api/services'
+import { calendrierApi, parametresApi } from '@/api/services'
 import { LoadingSpinner, EmptyState } from '@/components/common'
 import { CalendarDays } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
@@ -19,7 +19,9 @@ const TYPE_CONFIG = {
 function groupByMonth(events) {
   const months = {}
   events.forEach((ev) => {
-    const key = ev.date_debut ? format(parseISO(ev.date_debut), 'MMMM yyyy', { locale: fr }) : 'Sans date'
+    const key = ev.date_debut
+      ? format(parseISO(ev.date_debut), 'MMMM yyyy', { locale: fr })
+      : 'Sans date'
     if (!months[key]) months[key] = []
     months[key].push(ev)
   })
@@ -32,8 +34,15 @@ export default function Calendrier() {
     queryFn:  () => calendrierApi.getAll(),
   })
 
+  const { data: paramsData } = useQuery({
+    queryKey: ['parametres-public'],
+    queryFn:  () => parametresApi.getAll(),
+    staleTime: 5 * 60 * 1000,
+  })
+
   const events  = data?.data?.data || []
   const grouped = groupByMonth(events)
+  const annee   = paramsData?.data?.data?.annee_scolaire_courante || '2025-2026'
 
   return (
     <Box>
@@ -46,7 +55,8 @@ export default function Calendrier() {
             </Box>
           </Box>
           <Typography variant="h1" sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 36, md: 54 }, fontWeight: 700, color: '#fff', lineHeight: 1.1, mb: 1.5 }}>
-            Calendrier Scolaire 2025-2026
+            Calendrier Scolaire{' '}
+            <Box component="span" sx={{ color: ORANGE }}>{annee}</Box>
           </Typography>
           <Typography sx={{ color: 'rgba(255,255,255,0.65)', fontSize: 14.5, maxWidth: 480, mx: 'auto' }}>
             Vacances, jours fériés, examens et événements importants de l'année scolaire.
