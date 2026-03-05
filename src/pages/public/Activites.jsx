@@ -2,7 +2,7 @@
 // ACTIVITES LIST - Design Éditorial Premium
 // ============================================================
 import { useState } from 'react'
-import { Box, Container, Grid, Typography, Chip, Avatar, AvatarGroup } from '@mui/material'
+import { Box, Container, Grid, Typography, Chip, Avatar, IconButton } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { activitesApi } from '@/api/services'
