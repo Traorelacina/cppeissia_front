@@ -1,5 +1,5 @@
 // ============================================================
-// MOT DU DIRECTEUR
+// MOT DU DIRECTEUR - Version corrigée
 // ============================================================
 import { Box, Container, Grid, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
@@ -60,10 +60,11 @@ export default function MotDirecteur() {
                       alt="Directeur" 
                       sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       onError={(e) => {
-                        console.error('Erreur chargement photo:', params.photo_directeur);
+                        console.error('❌ Erreur chargement photo directeur:', params.photo_directeur);
                         e.target.style.display = 'none';
                         e.target.parentElement.innerHTML = '<span>👤</span>';
                       }}
+                      onLoad={() => console.log('✅ Photo directeur chargée')}
                     />
                   ) : (
                     <span>👤</span>
