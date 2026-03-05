@@ -269,9 +269,7 @@ export default function ActiviteDetail() {
                     <Box sx={{ width: 12, height: 12, borderRadius: '50%', background: sc.dot }} />
                   </Box>
                   <Box>
-                    <Typography sx={{ fontSize: 9.5, fontWeight: 800, color: sc.color, letterSpacing: '2px', textTransform: 'uppercase', mb: 0.25 }}>
-                      Section
-                    </Typography>
+                    
                     <Typography sx={{ fontSize: 15, fontWeight: 700, color: sc.color, lineHeight: 1 }}>
                       {sc.label}
                     </Typography>
@@ -294,14 +292,6 @@ export default function ActiviteDetail() {
                     </Box>
                   )}
 
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 2 }}>
-                    <Typography sx={{ fontSize: 12.5, color: '#8fa99b', fontWeight: 500 }}>
-                      Publié par
-                    </Typography>
-                    <Typography sx={{ fontSize: 13.5, fontWeight: 700, color: '#0c1a10' }}>
-                      {act.auteur?.name || 'CPPE Issia'}
-                    </Typography>
-                  </Box>
                 </Box>
 
                 {/* Bouton */}
@@ -336,16 +326,7 @@ export default function ActiviteDetail() {
                 background: sc.light,
                 borderRadius: '0 16px 16px 0',
               }}>
-                <Typography sx={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontSize: 17, fontStyle: 'italic',
-                  color: sc.color, lineHeight: 1.65, fontWeight: 600,
-                }}>
-                  « L'éducation est l'arme la plus puissante que vous puissiez utiliser pour changer le monde. »
-                </Typography>
-                <Typography sx={{ fontSize: 11.5, color: '#8fa99b', mt: 1, fontWeight: 600, letterSpacing: '0.5px' }}>
-                  — Nelson Mandela
-                </Typography>
+               
               </Box>
 
             </Box>
