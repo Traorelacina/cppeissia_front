@@ -101,9 +101,27 @@ export const parametresApi = {
   // Public
   getAll: () => api.get('/parametres'),
   getOne: (cle) => api.get(`/parametres/${cle}`),
-  // Admin
+  
+  // Admin - textes
   adminGetAll: () => api.get('/admin/parametres'),
   update: (cle, valeur) => api.put(`/admin/parametres/${cle}`, { valeur }),
+  
+  // Admin - photo (upload spécial)
+  uploadPhotoDirecteur: (formData) => api.post('/admin/parametres/photo-directeur', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  
+  // Alternative avec PUT si nécessaire
+  updatePhotoDirecteur: (valeur) => {
+    const formData = new FormData();
+    formData.append('valeur', valeur);
+    return api.post('/admin/parametres/photo-directeur', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  
+  // Supprimer la photo
+  deletePhotoDirecteur: () => api.delete('/admin/parametres/photo-directeur'),
 }
 
 // ========================
