@@ -3,15 +3,20 @@ const API_BASE_URL = 'https://used-edyth-freelence-0891ef2c.koyeb.app';
 
 /**
  * Corrige les URLs des images en remplaçant localhost par l'URL de production
+ * et en construisant les URLs complètes pour les chemins relatifs
  * @param {string} url - L'URL de l'image à corriger
  * @returns {string|null} - L'URL corrigée ou null
  */
 export const getImageUrl = (url) => {
   if (!url) return null;
   
-  // Si l'URL contient localhost ou 127.0.0.1
+  // Si c'est déjà une URL complète (http, https, data:)
+  if (url.startsWith('http') || url.startsWith('https') || url.startsWith('data:')) {
+    return url;
+  }
+  
+  // Si l'URL contient localhost ou 127.0.0.1 (anciennes données)
   if (url.includes('localhost') || url.includes('127.0.0.1')) {
-    // Remplacer par l'URL de production
     return url.replace(/http:\/\/[^\/]+/, API_BASE_URL);
   }
   
@@ -20,8 +25,18 @@ export const getImageUrl = (url) => {
     return `${API_BASE_URL}${url}`;
   }
   
-  // Si l'URL est déjà complète avec un autre domaine
-  return url;
+  // Si l'URL commence par storage/ (sans le slash)
+  if (url.startsWith('storage/')) {
+    return `${API_BASE_URL}/${url}`;
+  }
+  
+  // Si c'est un chemin comme photos/directeur/...
+  if (url.includes('/')) {
+    return `${API_BASE_URL}/storage/${url}`;
+  }
+  
+  // Si c'est juste un nom de fichier
+  return `${API_BASE_URL}/storage/${url}`;
 };
 
 /**
@@ -40,6 +55,7 @@ export const useImage = (initialSrc) => {
     setError(true);
     setLoading(false);
     console.log('❌ Erreur chargement image:', initialSrc);
+    console.log('URL tentée:', src);
   };
 
   const handleLoad = () => {
@@ -50,7 +66,9 @@ export const useImage = (initialSrc) => {
   const retry = () => {
     setError(false);
     setLoading(true);
-    setSrc(getImageUrl(initialSrc));
+    const newUrl = getImageUrl(initialSrc);
+    setSrc(newUrl);
+    console.log('🔄 Nouvelle tentative:', newUrl);
   };
 
   return {
