@@ -46,32 +46,15 @@ export default function PublicFooter() {
   return (
     <Box component="footer" sx={{ background: '#0c1a10', color: 'rgba(255,255,255,0.6)', mt: 0 }}>
 
-      {/* BANDE SUPÉRIEURE */}
+      {/* BANDE SUPÉRIEURE - MODIFIÉE : couleur orange et sans bouton */}
       {isOpen && (
-        <Box sx={{ background: '#1B7A3E', py: 2 }}>
+        <Box sx={{ background: ORANGE, py: 1.25 }}>
           <Container maxWidth="lg">
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
-              <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 13 }}>
-                Inscriptions {annee} ouvertes — {horaires}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+              <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: '#0f4a25', flexShrink: 0, animation: 'pulse-dot 2s infinite' }} />
+              <Typography sx={{ color: '#0f4a25', fontWeight: 700, fontSize: 12.5, flex: 1 }}>
+                Inscriptions {annee} ouvertes — {horaires.charAt(0).toUpperCase() + horaires.slice(1)}
               </Typography>
-              <Link to="/inscription" style={{ textDecoration: 'none' }}>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    background: ORANGE,
-                    color: '#0f4a25',
-                    px: 2,
-                    py: 0.75,
-                    borderRadius: '8px',
-                    fontWeight: 800,
-                    fontSize: 13,
-                  }}
-                >
-                  Constituer un dossier <ArrowUpRight size={14} />
-                </Box>
-              </Link>
             </Box>
           </Container>
         </Box>
