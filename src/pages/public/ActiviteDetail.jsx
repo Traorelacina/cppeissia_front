@@ -1,433 +1,404 @@
 // ============================================================
-// ACTIVITE DETAIL - redesign éditorial
+// ACTIVITE DETAIL - redesign éditorial épuré
 // ============================================================
-import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Box, Container, Grid, Typography, Button, Dialog } from '@mui/material'
+import { Box, Container, Grid, Typography, Button } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { activitesApi, parametresApi } from '@/api/services'
 import { LoadingSpinner } from '@/components/common'
-import { ArrowLeft, Image as ImageIcon, X, Camera, ChevronRight, Calendar } from 'lucide-react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 const DETAIL_STYLES = `
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(28px); }
     to   { opacity: 1; transform: translateY(0); }
   }
-  @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.94); }
+  @keyframes scaleReveal {
+    from { opacity: 0; transform: scale(1.04); }
     to   { opacity: 1; transform: scale(1); }
   }
-  .d-fade-1 { animation: fadeInUp 0.5s 0.05s ease both; }
-  .d-fade-2 { animation: fadeInUp 0.5s 0.13s ease both; }
-  .d-fade-3 { animation: fadeInUp 0.5s 0.21s ease both; }
-  .d-fade-4 { animation: fadeInUp 0.5s 0.29s ease both; }
+  @keyframes lineGrow {
+    from { width: 0; opacity: 0; }
+    to   { width: 48px; opacity: 1; }
+  }
 
-  .photo-thumb { transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
-  .photo-wrap:hover .photo-thumb { transform: scale(1.08); }
-  .photo-overlay { opacity: 0; transition: opacity 0.25s; }
-  .photo-wrap:hover .photo-overlay { opacity: 1; }
+  .d-hero   { animation: scaleReveal 0.9s cubic-bezier(0.4,0,0.2,1) both; }
+  .d-fade-1 { animation: fadeInUp 0.6s 0.10s ease both; }
+  .d-fade-2 { animation: fadeInUp 0.6s 0.22s ease both; }
+  .d-fade-3 { animation: fadeInUp 0.6s 0.34s ease both; }
+  .d-fade-4 { animation: fadeInUp 0.6s 0.46s ease both; }
+  .d-line   { animation: lineGrow  0.7s 0.50s ease both; }
 
-  .lightbox-enter { animation: scaleIn 0.25s ease both; }
+  .back-btn { transition: all 0.2s ease; }
+  .back-btn:hover { transform: translateX(-3px); }
+
+  .main-photo { transition: transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+  .photo-container:hover .main-photo { transform: scale(1.03); }
 `
 
 const SECTION_META = {
-  creche:          { label: 'Crèche',          color: '#a11460', bg: '#fce4ec', dot: '#e91e8c' },
-  petite_section:  { label: 'Petite Section',   color: '#b87b0f', bg: '#fff3e0', dot: '#F5A623' },
-  moyenne_section: { label: 'Moyenne Section',  color: '#1B7A3E', bg: '#eaf4ee', dot: '#4CAF50' },
-  grande_section:  { label: 'Grande Section',   color: '#6b21a8', bg: '#f3e8ff', dot: '#9c27b0' },
-  toutes:          { label: 'Toutes sections',  color: '#3949ab', bg: '#e8eaf6', dot: '#5c6bc0' },
+  creche:          { label: 'Crèche',          color: '#a11460', bg: '#fce4ec', dot: '#e91e8c', light: '#fff5f9' },
+  petite_section:  { label: 'Petite Section',   color: '#b87b0f', bg: '#fff3e0', dot: '#F5A623', light: '#fffcf0' },
+  moyenne_section: { label: 'Moyenne Section',  color: '#1B7A3E', bg: '#eaf4ee', dot: '#4CAF50', light: '#f2faf5' },
+  grande_section:  { label: 'Grande Section',   color: '#6b21a8', bg: '#f3e8ff', dot: '#9c27b0', light: '#fbf4ff' },
+  toutes:          { label: 'Toutes sections',  color: '#3949ab', bg: '#e8eaf6', dot: '#5c6bc0', light: '#f2f3ff' },
 }
 
-// ─────────────────────────────────────────────────────────────
-// Normalise un item média quelle que soit sa forme :
-// - objet Spatie brut  : { original_url, conversions_urls, ... }
-// - objet normalisé    : { original_url, conversions_urls, ... }
-// → retourne toujours { id, displayUrl, fullUrl }
-// ─────────────────────────────────────────────────────────────
 function normalizePhoto(m, i) {
   return {
-    id:         m.id ?? m.uuid ?? i,
-    displayUrl: m.conversions_urls?.thumb
-                || m.conversions_urls?.medium
-                || m.conversions_urls?.preview
-                || m.preview_url
-                || m.thumb
-                || m.medium
-                || m.original_url
-                || m.url
-                || null,
-    fullUrl:    m.original_url
-                || m.url
-                || m.conversions_urls?.medium
-                || m.conversions_urls?.thumb
-                || m.preview_url
-                || null,
+    id:  m.id ?? m.uuid ?? i,
+    src: m.conversions_urls?.medium
+      || m.conversions_urls?.thumb
+      || m.original_url
+      || m.preview_url
+      || m.url
+      || m.thumb
+      || null,
   }
 }
 
 export default function ActiviteDetail() {
   const { slug } = useParams()
-  const [lightbox, setLightbox]     = useState(null)
-  const [lightboxIdx, setLightboxIdx] = useState(0)
 
   const { data, isLoading } = useQuery({
     queryKey: ['activite-detail', slug],
     queryFn:  () => activitesApi.getBySlug(slug),
   })
 
-  const { data: paramsData } = useQuery({
-    queryKey: ['parametres-public'],
-    queryFn:  () => parametresApi.getAll(),
-    staleTime: 5 * 60 * 1000,
-  })
+  const act = data?.data?.data
 
-  const act    = data?.data?.data
-  const params = paramsData?.data?.data || {}
-
-  const annee       = params?.annee_scolaire_courante || '2025-2026'
-  const dateRentree = params?.date_rentree            || '06 octobre 2025'
-  const isOpen      = params?.inscriptions_ouvertes   !== 'false'
-
-  // ── Priorité : act.photos (tableau normalisé par le backend)
-  // Fallback : act.media (relation Spatie brute)
-  // act.photos est garanti non-null et normalisé par les deux controllers
   const rawPhotos = act?.photos || act?.media || act?.images || []
-  const photos    = rawPhotos
-    .map(normalizePhoto)
-    .filter(p => p.displayUrl || p.fullUrl)
-
-  const openLightbox = (photo, idx) => {
-    setLightbox(photo.fullUrl || photo.displayUrl)
-    setLightboxIdx(idx)
-  }
-  const prevPhoto = () => {
-    const newIdx = (lightboxIdx - 1 + photos.length) % photos.length
-    setLightbox(photos[newIdx].fullUrl || photos[newIdx].displayUrl)
-    setLightboxIdx(newIdx)
-  }
-  const nextPhoto = () => {
-    const newIdx = (lightboxIdx + 1) % photos.length
-    setLightbox(photos[newIdx].fullUrl || photos[newIdx].displayUrl)
-    setLightboxIdx(newIdx)
-  }
+  const mainPhoto = rawPhotos.map(normalizePhoto).find(p => p.src) ?? null
+  const coverUrl  = act?.photo_couverture || mainPhoto?.src || null
 
   if (isLoading) return <LoadingSpinner />
+
   if (!act) return (
-    <Box sx={{ py: 12, textAlign: 'center' }}>
-      <Typography sx={{ color: '#6b7c70', fontFamily: "'Cormorant Garamond', serif", fontSize: 24 }}>
+    <Box sx={{ py: 16, textAlign: 'center' }}>
+      <Typography sx={{ color: '#6b7c70', fontFamily: "'Cormorant Garamond', serif", fontSize: 26, mb: 3 }}>
         Activité introuvable.
       </Typography>
-      <Button component={Link} to="/activites" sx={{ mt: 2, color: '#1B7A3E' }}>
+      <Button component={Link} to="/activites" startIcon={<ArrowLeft size={15} />} sx={{ color: '#1B7A3E', fontWeight: 700 }}>
         Retour aux activités
       </Button>
     </Box>
   )
 
-  const sc       = SECTION_META[act.section] || { label: act.section, color: '#374151', bg: '#f3f4f6', dot: '#9e9e9e' }
-  const coverUrl = act.photo_couverture || photos[0]?.fullUrl || photos[0]?.displayUrl || null
+  const sc = SECTION_META[act.section] || {
+    label: act.section, color: '#374151', bg: '#f3f4f6', dot: '#9e9e9e', light: '#f9f9f9',
+  }
 
   return (
-    <Box>
+    <Box sx={{ background: '#f7faf8', minHeight: '100vh' }}>
       <style>{DETAIL_STYLES}</style>
 
-      {/* ══════════ HERO ══════════ */}
-      <Box sx={{
-        position: 'relative',
-        minHeight: { xs: 320, md: 480 },
-        background: coverUrl
-          ? `url(${coverUrl}) center/cover no-repeat`
-          : 'linear-gradient(135deg, #0a2e18 0%, #0f4a25 50%, #1a5e32 100%)',
-        display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-        overflow: 'hidden',
-      }}>
-        <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.25) 40%, rgba(5,20,10,0.88) 100%)' }} />
-        <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px)', backgroundSize: '48px 48px', pointerEvents: 'none' }} />
-        <Box sx={{ position: 'absolute', width: 500, height: 500, right: -150, top: -150, borderRadius: '50%', background: `radial-gradient(circle, ${sc.dot}15 0%, transparent 65%)`, pointerEvents: 'none' }} />
+      {/* ══════════ HERO — PHOTO PRINCIPALE ══════════ */}
+      {coverUrl ? (
+        <Box
+          className="photo-container"
+          sx={{
+            position: 'relative',
+            width: '100%',
+            height: { xs: 280, sm: 420, md: 560 },
+            overflow: 'hidden',
+            background: '#0a2e18',
+          }}
+        >
+          <Box
+            component="img"
+            src={coverUrl}
+            alt={act.titre}
+            className="main-photo d-hero"
+            sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block' }}
+            onError={(e) => { e.target.style.display = 'none' }}
+          />
 
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, pb: { xs: 4, md: 6 } }}>
+          {/* Dégradé bas vers haut */}
+          <Box sx={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, transparent 30%, rgba(4,16,9,0.80) 100%)',
+          }} />
+
+          {/* Grain subtil */}
+          <Box sx={{
+            position: 'absolute', inset: 0, pointerEvents: 'none', opacity: 0.5,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E")`,
+          }} />
+
+          {/* Titre en overlay bas */}
+          <Container maxWidth="lg" sx={{ position: 'absolute', bottom: 0, left: '50%', transform: 'translateX(-50%)', pb: { xs: 4, md: 5.5 }, width: '100%' }}>
+            <Box className="d-fade-1" sx={{ mb: 1.5 }}>
+              <Box sx={{
+                display: 'inline-flex', alignItems: 'center', gap: 1,
+                px: 1.5, py: 0.5, borderRadius: '20px',
+                background: 'rgba(255,255,255,0.12)',
+                border: '1px solid rgba(255,255,255,0.22)',
+                backdropFilter: 'blur(10px)',
+              }}>
+                <Box sx={{ width: 6, height: 6, borderRadius: '50%', background: sc.dot }} />
+                <Typography sx={{ fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '1.5px', textTransform: 'uppercase' }}>
+                  {sc.label}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Typography
+              className="d-fade-2"
+              component="h1"
+              sx={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: { xs: 32, sm: 44, md: 58 },
+                fontWeight: 700, color: '#fff',
+                lineHeight: 1.05, maxWidth: 820,
+                textShadow: '0 2px 24px rgba(0,0,0,0.25)',
+              }}
+            >
+              {act.titre}
+            </Typography>
+          </Container>
+        </Box>
+
+      ) : (
+        /* ── Fallback sans photo ── */
+        <Box sx={{
+          background: 'linear-gradient(135deg, #0a2e18 0%, #0f4a25 60%, #1B7A3E 100%)',
+          pt: { xs: 10, md: 14 }, pb: { xs: 5, md: 7 },
+          position: 'relative', overflow: 'hidden',
+        }}>
+          <Box sx={{ position: 'absolute', width: 600, height: 600, right: -200, top: -200, borderRadius: '50%', background: `radial-gradient(circle, ${sc.dot}12 0%, transparent 65%)`, pointerEvents: 'none' }} />
+          <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+            <Box className="d-fade-1" sx={{ mb: 1.5 }}>
+              <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, px: 1.5, py: 0.5, borderRadius: '20px', background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', backdropFilter: 'blur(8px)' }}>
+                <Box sx={{ width: 6, height: 6, borderRadius: '50%', background: sc.dot }} />
+                <Typography sx={{ fontSize: 10, fontWeight: 800, color: '#fff', letterSpacing: '1.5px', textTransform: 'uppercase' }}>{sc.label}</Typography>
+              </Box>
+            </Box>
+            <Typography className="d-fade-2" component="h1" sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 36, md: 58 }, fontWeight: 700, color: '#fff', lineHeight: 1.05, maxWidth: 720 }}>
+              {act.titre}
+            </Typography>
+          </Container>
+        </Box>
+      )}
+
+      {/* ══════════ CONTENU ══════════ */}
+      <Container maxWidth="lg" sx={{ py: { xs: 5, md: 8 } }}>
+
+        {/* Retour */}
+        <Box className="d-fade-1" sx={{ mb: { xs: 4, md: 5 } }}>
           <Button
             component={Link}
             to="/activites"
+            className="back-btn"
             startIcon={<ArrowLeft size={14} />}
-            className="d-fade-1"
             sx={{
-              color: 'rgba(255,255,255,0.65)', mb: 3, mt: { xs: 10, md: 12 },
-              fontSize: 12.5, fontWeight: 600, borderRadius: '20px', px: 1.5,
-              '&:hover': { color: '#fff', background: 'rgba(255,255,255,0.08)' },
+              color: '#8fa99b', fontWeight: 600, fontSize: 13, px: 0,
+              '&:hover': { color: '#1B7A3E', background: 'transparent' },
             }}
           >
             Retour aux activités
           </Button>
+        </Box>
 
-          <Box className="d-fade-2" sx={{ mb: 1.75 }}>
-            <Box sx={{
-              display: 'inline-flex', alignItems: 'center', gap: 1,
-              px: 1.75, py: 0.55, borderRadius: '20px',
-              background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)',
-              backdropFilter: 'blur(8px)',
-            }}>
-              <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: sc.dot, flexShrink: 0 }} />
-              <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '1px' }}>
-                {sc.label}
+        <Grid container spacing={{ xs: 4, md: 7 }}>
+
+          {/* ── DESCRIPTION ── */}
+          <Grid item xs={12} md={7}>
+
+            <Box className="d-fade-2" sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3.5 }}>
+              <Box className="d-line" sx={{ width: 48, height: 2.5, background: '#F5A623', borderRadius: 2, flexShrink: 0 }} />
+              <Typography sx={{ fontSize: 10.5, fontWeight: 800, color: '#F5A623', letterSpacing: '3px', textTransform: 'uppercase' }}>
+                À propos
               </Typography>
             </Box>
-          </Box>
 
-          <Typography
-            className="d-fade-3"
-            variant="h1"
-            sx={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: { xs: 34, md: 58 }, fontWeight: 700,
-              color: '#fff', lineHeight: 1.05, mb: 2, maxWidth: 720,
-            }}
-          >
-            {act.titre}
-          </Typography>
-
-          {photos.length > 0 && (
-            <Box className="d-fade-4" sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                <Camera size={13} color="rgba(255,255,255,0.6)" />
-                <Typography sx={{ fontSize: 12.5, color: 'rgba(255,255,255,0.6)', fontWeight: 500 }}>
-                  {photos.length} photo{photos.length > 1 ? 's' : ''}
-                </Typography>
-              </Box>
-            </Box>
-          )}
-        </Container>
-      </Box>
-
-      {/* ══════════ CONTENU PRINCIPAL ══════════ */}
-      <Box sx={{ background: '#f4f8f5', py: { xs: 5, md: 8 } }}>
-        <Container maxWidth="lg">
-          <Grid container spacing={4}>
-
-            {/* DESCRIPTION */}
-            <Grid item xs={12} md={8}>
-              <Box className="d-fade-2" sx={{
-                background: '#fff', borderRadius: '24px',
-                border: '1px solid rgba(27,122,62,0.1)', overflow: 'hidden',
-                boxShadow: '0 4px 24px rgba(27,122,62,0.06)',
+            {/* Titre affiché ici aussi si pas de photo hero (évite la répétition sinon) */}
+            {coverUrl && (
+              <Typography className="d-fade-2" sx={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: { xs: 28, md: 40 }, fontWeight: 700,
+                color: '#0c1a10', lineHeight: 1.12, mb: 3.5,
               }}>
-                <Box sx={{ px: { xs: 3, md: 4 }, pt: { xs: 3, md: 4 }, pb: 2.5, borderBottom: '1px solid rgba(27,122,62,0.08)', display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                  <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
-                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#F5A623', letterSpacing: '3px', textTransform: 'uppercase' }}>
-                    Description
-                  </Typography>
-                </Box>
-                <Box sx={{ px: { xs: 3, md: 4 }, py: 3.5 }}>
-                  <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 20, md: 26 }, fontWeight: 700, color: '#0c1a10', mb: 2.5, lineHeight: 1.25 }}>
-                    À propos de cette activité
-                  </Typography>
-                  <Box
-                    sx={{ fontSize: 14.5, color: '#4b5563', lineHeight: 1.9, '& p': { mb: 1.5 }, '& ul, & ol': { pl: 2.5 }, '& strong': { color: '#0c1a10', fontWeight: 700 } }}
-                    dangerouslySetInnerHTML={{ __html: act.description || '<p>Aucune description disponible.</p>' }}
-                  />
-                </Box>
-              </Box>
-            </Grid>
+                {act.titre}
+              </Typography>
+            )}
 
-            {/* SIDEBAR */}
-            <Grid item xs={12} md={4}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+            {/* Corps */}
+            <Box
+              className="d-fade-3"
+              sx={{
+                fontSize: { xs: 15, md: 16.5 },
+                color: '#3d5244',
+                lineHeight: 1.95,
+                '& p':        { mb: 2, '&:last-child': { mb: 0 } },
+                '& ul, & ol': { pl: 2.5, mb: 2 },
+                '& li':       { mb: 0.75 },
+                '& strong':   { color: '#0c1a10', fontWeight: 700 },
+                '& em':       { color: '#1B7A3E', fontStyle: 'italic' },
+              }}
+              dangerouslySetInnerHTML={{ __html: act.description || '<p>Aucune description disponible.</p>' }}
+            />
+          </Grid>
 
-                {/* Infos */}
-                <Box className="d-fade-3" sx={{ background: '#fff', borderRadius: '20px', p: 3, border: '1px solid rgba(27,122,62,0.1)', boxShadow: '0 4px 24px rgba(27,122,62,0.06)' }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2.5 }}>
-                    <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
-                    <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#F5A623', letterSpacing: '3px', textTransform: 'uppercase' }}>
-                      Informations
+          {/* ── SIDEBAR ── */}
+          <Grid item xs={12} md={5}>
+            <Box className="d-fade-4" sx={{ position: { md: 'sticky' }, top: { md: 96 } }}>
+
+              {/* Carte méta */}
+              <Box sx={{
+                background: '#fff',
+                borderRadius: '24px',
+                border: '1px solid rgba(27,122,62,0.1)',
+                overflow: 'hidden',
+                boxShadow: '0 8px 40px rgba(27,122,62,0.07)',
+                mb: 3,
+              }}>
+                {/* Bandeau section */}
+                <Box sx={{
+                  background: `linear-gradient(120deg, ${sc.color}14 0%, ${sc.dot}0d 100%)`,
+                  borderBottom: `3px solid ${sc.dot}20`,
+                  px: 3.5, py: 3,
+                  display: 'flex', alignItems: 'center', gap: 2,
+                }}>
+                  <Box sx={{
+                    width: 42, height: 42, borderRadius: '50%',
+                    background: sc.bg,
+                    border: `2px solid ${sc.dot}50`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    flexShrink: 0,
+                  }}>
+                    <Box sx={{ width: 12, height: 12, borderRadius: '50%', background: sc.dot }} />
+                  </Box>
+                  <Box>
+                    <Typography sx={{ fontSize: 9.5, fontWeight: 800, color: sc.color, letterSpacing: '2px', textTransform: 'uppercase', mb: 0.25 }}>
+                      Section
+                    </Typography>
+                    <Typography sx={{ fontSize: 15, fontWeight: 700, color: sc.color, lineHeight: 1 }}>
+                      {sc.label}
                     </Typography>
                   </Box>
-
-                  {[
-                    { label: 'Section concernée', value: sc.label,                                              valueColor: sc.color   },
-                    { label: 'Nombre de photos',  value: `${photos.length} photo${photos.length > 1 ? 's' : ''}`, valueColor: '#0c1a10' },
-                    { label: 'Année scolaire',    value: annee,                                                 valueColor: '#1B7A3E' },
-                  ].map(({ label, value, valueColor }, i) => (
-                    <Box key={label} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 1.5, borderBottom: i < 2 ? '1px solid #f4f8f5' : 'none' }}>
-                      <Typography sx={{ fontSize: 12.5, color: '#6b7c70' }}>{label}</Typography>
-                      <Typography sx={{ fontSize: 13, fontWeight: 700, color: valueColor }}>{value}</Typography>
-                    </Box>
-                  ))}
-
-                  <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid #f4f8f5' }}>
-                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, px: 1.75, py: 0.75, borderRadius: '20px', background: sc.bg, border: `1px solid ${sc.dot}30` }}>
-                      <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: sc.dot }} />
-                      <Typography sx={{ fontSize: 12, fontWeight: 700, color: sc.color }}>{sc.label}</Typography>
-                    </Box>
-                  </Box>
                 </Box>
 
-                {/* CTA Inscription */}
-                <Box className="d-fade-4" sx={{ background: 'linear-gradient(160deg, #0a2e18 0%, #0f4a25 55%, #1B7A3E 100%)', borderRadius: '20px', p: 3, position: 'relative', overflow: 'hidden' }}>
-                  <Box sx={{ position: 'absolute', width: 200, height: 200, right: -60, bottom: -60, borderRadius: '50%', background: 'rgba(245,166,35,0.06)', pointerEvents: 'none' }} />
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-                    <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
-                    <Typography sx={{ fontSize: 10, fontWeight: 800, color: '#F5A623', letterSpacing: '2.5px', textTransform: 'uppercase' }}>
-                      {isOpen ? 'Inscriptions ouvertes' : 'Dossier'}
-                    </Typography>
-                  </Box>
-                  <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 700, color: '#fff', mb: 1, lineHeight: 1.2 }}>
-                    Inscrire mon enfant
-                  </Typography>
-                  <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: 12.5, mb: 0.5, lineHeight: 1.65 }}>
-                    Année scolaire{' '}
-                    <Box component="strong" sx={{ color: '#F5A623' }}>{annee}</Box>
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2.5, mt: 0.5, px: 1.5, py: 0.75, borderRadius: '10px', background: 'rgba(245,166,35,0.1)', border: '1px solid rgba(245,166,35,0.2)' }}>
-                    <Calendar size={13} color="#F5A623" />
-                    <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', fontWeight: 500 }}>
-                      Rentrée le{' '}
-                      <Box component="strong" sx={{ color: '#F5A623' }}>{dateRentree}</Box>
-                    </Typography>
-                  </Box>
-                  {isOpen ? (
-                    <Button
-                      component={Link}
-                      to="/inscription"
-                      variant="contained"
-                      fullWidth
-                      endIcon={<ChevronRight size={15} />}
-                      sx={{ background: '#F5A623', color: '#0f4a25', fontWeight: 800, py: 1.3, fontSize: 13, borderRadius: '12px', '&:hover': { background: '#e0951f', transform: 'translateY(-1px)' }, transition: 'all 0.2s', boxShadow: '0 6px 20px rgba(245,166,35,0.3)' }}
-                    >
-                      Constituer mon dossier
-                    </Button>
-                  ) : (
-                    <Box sx={{ px: 2, py: 1.5, borderRadius: '12px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', textAlign: 'center' }}>
-                      <Typography sx={{ fontSize: 12.5, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
-                        Les inscriptions sont actuellement fermées.<br />
-                        <Box component="strong" sx={{ color: 'rgba(255,255,255,0.7)' }}>Préparez votre dossier dès maintenant.</Box>
+                {/* Champs */}
+                <Box sx={{ px: 3.5, py: 2.5 }}>
+                  {act.date_activite && (
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 2, borderBottom: '1px solid #f0f5f2' }}>
+                      <Typography sx={{ fontSize: 12.5, color: '#8fa99b', fontWeight: 500 }}>
+                        Date
+                      </Typography>
+                      <Typography sx={{ fontSize: 13.5, fontWeight: 700, color: '#0c1a10' }}>
+                        {act.date_formatted
+                          || new Date(act.date_activite).toLocaleDateString('fr-FR', {
+                              day: 'numeric', month: 'long', year: 'numeric',
+                             })}
                       </Typography>
                     </Box>
                   )}
-                </Box>
 
-              </Box>
-            </Grid>
-          </Grid>
-
-          {/* ══════════ GALERIE ══════════ */}
-          {photos.length > 0 && (
-            <Box sx={{ mt: 6 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3.5, flexWrap: 'wrap', gap: 2 }}>
-                <Box>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
-                    <Box sx={{ width: 28, height: 2, background: '#F5A623' }} />
-                    <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#F5A623', letterSpacing: '3px', textTransform: 'uppercase' }}>
-                      Galerie
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', py: 2 }}>
+                    <Typography sx={{ fontSize: 12.5, color: '#8fa99b', fontWeight: 500 }}>
+                      Publié par
+                    </Typography>
+                    <Typography sx={{ fontSize: 13.5, fontWeight: 700, color: '#0c1a10' }}>
+                      {act.auteur?.name || 'CPPE Issia'}
                     </Typography>
                   </Box>
-                  <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 26, md: 36 }, fontWeight: 700, color: '#0c1a10' }}>
-                    Photos de l'activité
-                  </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, px: 2, py: 0.75, borderRadius: '20px', background: 'rgba(27,122,62,0.08)', border: '1px solid rgba(27,122,62,0.15)' }}>
-                  <Camera size={13} color="#1B7A3E" />
-                  <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: '#1B7A3E' }}>
-                    {photos.length} photo{photos.length > 1 ? 's' : ''}
-                  </Typography>
+
+                {/* Bouton */}
+                <Box sx={{ px: 3.5, pb: 3.5 }}>
+                  <Button
+                    component={Link}
+                    to="/activites"
+                    fullWidth
+                    endIcon={<ArrowRight size={15} />}
+                    sx={{
+                      background: 'linear-gradient(135deg, #0f4a25, #1B7A3E)',
+                      color: '#fff', fontWeight: 700, fontSize: 13.5,
+                      py: 1.5, borderRadius: '14px',
+                      boxShadow: '0 6px 20px rgba(15,74,37,0.22)',
+                      transition: 'all 0.22s',
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #0a2e18, #0f4a25)',
+                        transform: 'translateY(-1px)',
+                        boxShadow: '0 10px 28px rgba(15,74,37,0.32)',
+                      },
+                    }}
+                  >
+                    Voir toutes les activités
+                  </Button>
                 </Box>
               </Box>
 
-              <Grid container spacing={1.5}>
-                {photos.map((photo, idx) => (
-                  <Grid item xs={6} sm={4} md={3} key={photo.id}>
-                    <Box
-                      className="photo-wrap"
-                      onClick={() => openLightbox(photo, idx)}
-                      sx={{
-                        paddingTop: '75%', position: 'relative', borderRadius: '16px',
-                        overflow: 'hidden', cursor: 'pointer', background: '#eaf4ee',
-                        border: '2px solid transparent',
-                        transition: 'border-color 0.2s, box-shadow 0.2s',
-                        '&:hover': { borderColor: 'rgba(27,122,62,0.3)', boxShadow: '0 8px 28px rgba(27,122,62,0.18)' },
-                      }}
-                    >
-                      {(photo.displayUrl || photo.fullUrl) ? (
-                        <Box
-                          component="img"
-                          src={photo.displayUrl || photo.fullUrl}
-                          alt={`Photo ${idx + 1}`}
-                          className="photo-thumb"
-                          sx={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                          onError={(e) => { e.target.style.display = 'none' }}
-                        />
-                      ) : (
-                        <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <ImageIcon size={28} color="#9ca3af" />
-                        </Box>
-                      )}
-                      <Box
-                        className="photo-overlay"
-                        sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(15,74,37,0.6), rgba(0,0,0,0.3))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                      >
-                        <Box sx={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', border: '1.5px solid rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                          <ImageIcon size={18} color="#fff" />
-                        </Box>
-                      </Box>
-                      <Box sx={{ position: 'absolute', bottom: 8, right: 8, px: 1.25, py: 0.4, borderRadius: '12px', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
-                        <Typography sx={{ fontSize: 10.5, fontWeight: 700, color: '#fff' }}>
-                          {idx + 1}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
+              {/* Citation décorative */}
+              <Box sx={{
+                px: 3, py: 2.5,
+                borderLeft: `4px solid ${sc.dot}`,
+                background: sc.light,
+                borderRadius: '0 16px 16px 0',
+              }}>
+                <Typography sx={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 17, fontStyle: 'italic',
+                  color: sc.color, lineHeight: 1.65, fontWeight: 600,
+                }}>
+                  « L'éducation est l'arme la plus puissante que vous puissiez utiliser pour changer le monde. »
+                </Typography>
+                <Typography sx={{ fontSize: 11.5, color: '#8fa99b', mt: 1, fontWeight: 600, letterSpacing: '0.5px' }}>
+                  — Nelson Mandela
+                </Typography>
+              </Box>
+
             </Box>
-          )}
+          </Grid>
+
+        </Grid>
+      </Container>
+
+      {/* ══════════ BANDE FOOTER ══════════ */}
+      <Box sx={{
+        background: 'linear-gradient(135deg, #0a2e18 0%, #0f4a25 100%)',
+        mt: { xs: 4, md: 6 },
+        py: { xs: 4, md: 5 },
+      }}>
+        <Container maxWidth="lg">
+          <Box sx={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            flexWrap: 'wrap', gap: 3,
+          }}>
+            <Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+                <Box sx={{ width: 24, height: 2, background: '#F5A623' }} />
+                <Typography sx={{ fontSize: 9.5, fontWeight: 800, color: '#F5A623', letterSpacing: '2.5px', textTransform: 'uppercase' }}>
+                  CPPE Issia
+                </Typography>
+              </Box>
+              <Typography sx={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: { xs: 20, md: 24 }, fontWeight: 700, color: '#fff',
+              }}>
+                Découvrez nos autres activités
+              </Typography>
+            </Box>
+            <Button
+              component={Link}
+              to="/activites"
+              endIcon={<ArrowRight size={15} />}
+              sx={{
+                background: 'rgba(255,255,255,0.08)',
+                border: '1.5px solid rgba(255,255,255,0.2)',
+                color: '#fff', fontWeight: 700, fontSize: 13,
+                px: 3, py: 1.3, borderRadius: '30px',
+                backdropFilter: 'blur(8px)',
+                transition: 'all 0.2s',
+                '&:hover': { background: '#F5A623', borderColor: '#F5A623', color: '#0f4a25' },
+              }}
+            >
+              Toutes les activités
+            </Button>
+          </Box>
         </Container>
       </Box>
 
-      {/* ══════════ LIGHTBOX ══════════ */}
-      <Dialog
-        open={!!lightbox}
-        onClose={() => setLightbox(null)}
-        maxWidth="md" fullWidth
-        PaperProps={{ sx: { background: 'transparent', boxShadow: 'none' } }}
-      >
-        <Box className="lightbox-enter" sx={{ position: 'relative' }}>
-          <Box
-            component="img"
-            src={lightbox}
-            alt="Photo"
-            sx={{ width: '100%', borderRadius: '16px', display: 'block', maxHeight: '85vh', objectFit: 'contain' }}
-          />
-
-          {/* Fermer */}
-          <Box
-            onClick={() => setLightbox(null)}
-            sx={{ position: 'absolute', top: 12, right: 12, width: 40, height: 40, borderRadius: '50%', background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#fff', border: '1px solid rgba(255,255,255,0.15)', '&:hover': { background: 'rgba(0,0,0,0.85)' } }}
-          >
-            <X size={18} />
-          </Box>
-
-          {photos.length > 1 && (
-            <>
-              <Box
-                onClick={prevPhoto}
-                sx={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', width: 40, height: 40, borderRadius: '50%', background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.15)', '&:hover': { background: 'rgba(0,0,0,0.8)' } }}
-              >
-                <ArrowLeft size={16} color="#fff" />
-              </Box>
-              <Box
-                onClick={nextPhoto}
-                sx={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', width: 40, height: 40, borderRadius: '50%', background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.15)', '&:hover': { background: 'rgba(0,0,0,0.8)' } }}
-              >
-                <ChevronRight size={16} color="#fff" />
-              </Box>
-              <Box sx={{ position: 'absolute', bottom: 14, left: '50%', transform: 'translateX(-50%)', px: 2, py: 0.6, borderRadius: '20px', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)' }}>
-                <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>
-                  {lightboxIdx + 1} / {photos.length}
-                </Typography>
-              </Box>
-            </>
-          )}
-        </Box>
-      </Dialog>
     </Box>
   )
 }
