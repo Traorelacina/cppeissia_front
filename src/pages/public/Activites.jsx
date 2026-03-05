@@ -1,5 +1,5 @@
 // ============================================================
-// ACTIVITES LIST - Design Éditorial Premium
+// ACTIVITES LIST - Activités de l'école (événements, sorties, ateliers)
 // ============================================================
 import { useState } from 'react'
 import { Box, Container, Grid, Typography, Chip, Avatar, IconButton } from '@mui/material'
@@ -11,16 +11,17 @@ import {
   ArrowRight, 
   Sparkles, 
   Camera, 
-  Clock, 
-  Users, 
   Calendar,
+  Users,
+  MapPin,
   Heart,
   BookOpen,
   Star,
-  Play,
   Image as ImageIcon
 } from 'lucide-react'
 import { getImageUrl } from '@/utils/imageHelper'
+import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
 const ORANGE = '#FF7F27'
 
@@ -62,13 +63,6 @@ const ACT_STYLES = `
   
   .act-media-gallery:hover {
     transform: scale(1.02);
-  }
-  
-  .act-title {
-    background: linear-gradient(135deg, #0c1a10 0%, #1B7A3E 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
   
   .act-category-chip {
@@ -167,64 +161,6 @@ function ActMediaGallery({ act }) {
           </Typography>
         </Box>
       )}
-
-      {/* Bouton play si activité vidéo (optionnel) */}
-      {act.has_video && (
-        <Box sx={{
-          position: 'absolute',
-          bottom: 16,
-          left: 16,
-          width: 44,
-          height: 44,
-          borderRadius: '50%',
-          background: ORANGE,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: `0 8px 20px ${ORANGE}80`,
-          zIndex: 2,
-          transition: 'transform 0.3s',
-          '&:hover': { transform: 'scale(1.1)' },
-        }}>
-          <Play size={20} color="#0f4a25" fill="#0f4a25" />
-        </Box>
-      )}
-    </Box>
-  )
-}
-
-function ActStats({ act }) {
-  const stats = [
-    { icon: Calendar, value: '2024', label: 'Année' },
-    { icon: Users, value: act.participants_count || '24', label: 'Enfants' },
-    { icon: Clock, value: '45 min', label: 'Durée' },
-  ]
-
-  return (
-    <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-      {stats.map(({ icon: Icon, value, label }) => (
-        <Box key={label} sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-          <Box sx={{
-            width: 32,
-            height: 32,
-            borderRadius: '10px',
-            background: `rgba(27,122,62,0.08)`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-            <Icon size={16} color="#1B7A3E" />
-          </Box>
-          <Box>
-            <Typography sx={{ fontSize: 14, fontWeight: 700, color: '#0c1a10', lineHeight: 1.2 }}>
-              {value}
-            </Typography>
-            <Typography sx={{ fontSize: 10, color: '#6b7c70', fontWeight: 500 }}>
-              {label}
-            </Typography>
-          </Box>
-        </Box>
-      ))}
     </Box>
   )
 }
@@ -233,8 +169,13 @@ function ActCard({ act, index, variant = 'default' }) {
   const [isHovered, setIsHovered] = useState(false)
   const isFeatured = index === 0 && variant === 'featured'
   
-  // Catégories simulées (à remplacer par des données réelles)
-  const categories = ['Éveil', 'Créatif', 'Sportif'].slice(0, Math.floor(Math.random() * 3) + 1)
+  // Formater la date
+  const dateFormatee = act.date_activite 
+    ? format(new Date(act.date_activite), 'dd MMMM yyyy', { locale: fr })
+    : 'Date à confirmer'
+
+  // Déterminer si c'est une activité à venir ou passée
+  const isUpcoming = act.date_activite && new Date(act.date_activite) > new Date()
 
   return (
     <Box 
@@ -281,6 +222,27 @@ function ActCard({ act, index, variant = 'default' }) {
           </Box>
         )}
 
+        {/* Badge "À venir" pour les activités futures */}
+        {isUpcoming && !isFeatured && (
+          <Box sx={{
+            position: 'absolute',
+            top: 20,
+            left: 20,
+            zIndex: 10,
+            px: 1.5,
+            py: 0.5,
+            borderRadius: '20px',
+            background: '#1B7A3E',
+            color: '#fff',
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: '0.5px',
+            boxShadow: '0 4px 12px rgba(27,122,62,0.3)',
+          }}>
+            À VENIR
+          </Box>
+        )}
+
         {/* Section média */}
         <Box sx={{ p: 2, pb: 0 }}>
           <ActMediaGallery act={act} />
@@ -288,25 +250,22 @@ function ActCard({ act, index, variant = 'default' }) {
 
         {/* Contenu */}
         <Box sx={{ p: 3, pt: 2.5, flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* Catégories */}
-          <Box sx={{ display: 'flex', gap: 0.75, mb: 1.5, flexWrap: 'wrap' }}>
-            {categories.map((cat, i) => (
-              <Chip
-                key={i}
-                label={cat}
-                size="small"
-                className="act-category-chip"
-                sx={{
-                  background: `rgba(255,127,39,0.08)`,
-                  color: ORANGE,
-                  fontWeight: 600,
-                  fontSize: 10,
-                  height: 24,
-                  '& .MuiChip-label': { px: 1.5 },
-                  border: `1px solid ${ORANGE}20`,
-                }}
-              />
-            ))}
+          {/* Date et lieu (si disponible) */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1.5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Calendar size={14} color={ORANGE} />
+              <Typography sx={{ fontSize: 12, color: '#6b7c70' }}>
+                {dateFormatee}
+              </Typography>
+            </Box>
+            {act.lieu && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <MapPin size={14} color={ORANGE} />
+                <Typography sx={{ fontSize: 12, color: '#6b7c70' }}>
+                  {act.lieu}
+                </Typography>
+              </Box>
+            )}
           </Box>
 
           {/* Titre */}
@@ -317,7 +276,7 @@ function ActCard({ act, index, variant = 'default' }) {
               fontSize: isFeatured ? 32 : 26,
               fontWeight: 700,
               lineHeight: 1.2,
-              mb: 1,
+              mb: 1.5,
               color: '#0c1a10',
               transition: 'color 0.3s',
               '&:hover': { color: ORANGE },
@@ -345,19 +304,16 @@ function ActCard({ act, index, variant = 'default' }) {
             }}
           />
 
-          {/* Statistiques */}
-          <ActStats act={act} />
-
           {/* Footer avec actions */}
           <Box sx={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            mt: 2.5,
+            mt: 'auto',
             pt: 2,
             borderTop: '1px solid rgba(27,122,62,0.08)',
           }}>
-            {/* Auteur / Groupe */}
+            {/* Auteur / Organisateur */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <Avatar
                 sx={{
@@ -368,14 +324,14 @@ function ActCard({ act, index, variant = 'default' }) {
                   fontWeight: 700,
                 }}
               >
-                {act.auteur?.charAt(0) || 'CP'}
+                {act.auteur?.name?.charAt(0) || 'CP'}
               </Avatar>
               <Box>
                 <Typography sx={{ fontSize: 11, color: '#6b7c70', lineHeight: 1 }}>
-                  Encadré par
+                  Organisé par
                 </Typography>
                 <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#0c1a10' }}>
-                  {act.auteur || 'Équipe pédagogique'}
+                  {act.auteur?.name || 'Équipe pédagogique'}
                 </Typography>
               </Box>
             </Box>
@@ -403,7 +359,7 @@ function ActCard({ act, index, variant = 'default' }) {
                   color: isHovered ? '#0f4a25' : '#1B7A3E',
                   transition: 'color 0.3s',
                 }}>
-                  Explorer
+                  Voir l'activité
                 </Typography>
                 <ArrowRight 
                   size={14} 
@@ -415,29 +371,6 @@ function ActCard({ act, index, variant = 'default' }) {
                 />
               </Box>
             </Link>
-          </Box>
-
-          {/* Like / Favoris (optionnel) */}
-          <Box sx={{
-            position: 'absolute',
-            top: 20,
-            right: 20,
-            zIndex: 10,
-            opacity: isHovered ? 1 : 0,
-            transform: isHovered ? 'translateX(0)' : 'translateX(10px)',
-            transition: 'all 0.3s',
-          }}>
-            <IconButton
-              sx={{
-                width: 36,
-                height: 36,
-                bgcolor: '#fff',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                '&:hover': { bgcolor: '#fff', transform: 'scale(1.1)' },
-              }}
-            >
-              <Heart size={18} color={ORANGE} />
-            </IconButton>
           </Box>
         </Box>
       </Box>
@@ -458,45 +391,49 @@ export default function Activites() {
   const activites = data?.data?.data?.data || []
   const totalActivites = activites.length
 
+  // Compter les activités à venir
+  const activitesAVenir = activites.filter(act => 
+    act.date_activite && new Date(act.date_activite) > new Date()
+  ).length
+
   return (
     <Box>
       <style>{ACT_STYLES}</style>
 
-      {/* ══════════ HERO PREMIUM ══════════ */}
+      {/* ══════════ HERO ══════════ */}
       <Box sx={{
-        background: 'radial-gradient(ellipse at 50% 30%, #1a5e32 0%, #0a2e18 100%)',
+        background: 'linear-gradient(135deg, #0a2e18 0%, #0f4a25 50%, #1a5e32 100%)',
         pt: { xs: 10, md: 14 },
         pb: { xs: 8, md: 12 },
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Éléments décoratifs */}
+        {/* Grille de fond */}
         <Box sx={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          top: 0,
-          left: 0,
-          background: 'radial-gradient(circle at 20% 50%, rgba(255,127,39,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255,127,39,0.05) 0%, transparent 50%)',
-          pointerEvents: 'none',
+          position: 'absolute', inset: 0,
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
+          backgroundSize: '48px 48px', pointerEvents: 'none',
         }} />
-        
+        {/* Halos décoratifs */}
+        <Box sx={{ position: 'absolute', width: 700, height: 700, right: -250, top: -250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,127,39,0.09) 0%, transparent 65%)', pointerEvents: 'none' }} />
+        <Box sx={{ position: 'absolute', width: 400, height: 400, left: -100, bottom: -100, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,195,74,0.06) 0%, transparent 65%)', pointerEvents: 'none' }} />
+
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
           <Grid container spacing={4} alignItems="center">
             <Grid item xs={12} md={7}>
               <Box sx={{ animation: 'slideInRight 0.8s ease' }}>
-                <Chip
-                  label="✨ ÉVEIL & DÉCOUVERTE"
-                  sx={{
-                    bgcolor: 'rgba(255,127,39,0.15)',
-                    color: ORANGE,
-                    fontWeight: 700,
-                    fontSize: 11,
-                    letterSpacing: '1.5px',
-                    mb: 2,
-                    border: `1px solid ${ORANGE}30`,
-                  }}
-                />
+                {/* Badge */}
+                <Box sx={{
+                  display: 'inline-flex', alignItems: 'center', gap: 1.25,
+                  px: 2, py: 0.65, borderRadius: '30px',
+                  background: 'rgba(255,127,39,0.12)', border: '1px solid rgba(255,127,39,0.28)',
+                  mb: 2.5,
+                }}>
+                  <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: ORANGE, animation: 'pulse-dot 2.2s ease infinite' }} />
+                  <Typography sx={{ fontSize: 10.5, fontWeight: 800, color: ORANGE, letterSpacing: '2.5px', textTransform: 'uppercase' }}>
+                    VIE SCOLAIRE
+                  </Typography>
+                </Box>
                 
                 <Typography
                   variant="h1"
@@ -509,9 +446,9 @@ export default function Activites() {
                     mb: 2,
                   }}
                 >
-                  L'aventure
+                  Activités et
                   <Box component="span" sx={{ color: ORANGE, display: 'block', fontStyle: 'italic' }}>
-                    au cœur de l'enfance
+                    événements
                   </Box>
                 </Typography>
 
@@ -522,10 +459,10 @@ export default function Activites() {
                   maxWidth: 520,
                   mb: 3,
                 }}>
-                  Chaque jour, nos petits explorateurs vivent des expériences uniques à travers des activités soigneusement conçues pour éveiller leurs sens et développer leur créativité.
+                  Découvrez toutes les activités organisées par l'école : sorties scolaires, ateliers spéciaux, célébrations et événements pédagogiques.
                 </Typography>
 
-                {/* Stats élégantes */}
+                {/* Stats réelles */}
                 <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
                   <Box>
                     <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 36, fontWeight: 700, color: ORANGE, lineHeight: 1 }}>
@@ -537,10 +474,10 @@ export default function Activites() {
                   </Box>
                   <Box>
                     <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 36, fontWeight: 700, color: ORANGE, lineHeight: 1 }}>
-                      150+
+                      {activitesAVenir}
                     </Typography>
                     <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                      Enfants heureux
+                      À venir
                     </Typography>
                   </Box>
                   <Box>
@@ -606,7 +543,7 @@ export default function Activites() {
           {/* En-tête de section */}
           <Box sx={{ mb: 5, textAlign: 'center' }}>
             <Chip
-              label="NOTRE PROGRAMME"
+              label="PROGRAMME SCOLAIRE"
               sx={{
                 bgcolor: 'rgba(255,127,39,0.1)',
                 color: ORANGE,
@@ -626,10 +563,12 @@ export default function Activites() {
                 mb: 1,
               }}
             >
-              Des activités pour <Box component="span" sx={{ color: ORANGE }}>grandir</Box>
+              Nos <Box component="span" sx={{ color: ORANGE }}>activités</Box>
             </Typography>
             <Typography sx={{ color: '#6b7c70', fontSize: 15, maxWidth: 560, mx: 'auto' }}>
-              Découvrez notre sélection d'activités pensées pour l'épanouissement de chaque enfant
+              {totalActivites > 0 
+                ? `Découvrez les ${totalActivites} activités organisées par l'école` 
+                : 'Aucune activité pour le moment'}
             </Typography>
           </Box>
 
@@ -660,10 +599,10 @@ export default function Activites() {
                 <Sparkles size={40} color="#1B7A3E" style={{ opacity: 0.5 }} />
               </Box>
               <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 28, fontWeight: 700, color: '#0c1a10', mb: 1 }}>
-                Bientôt disponible
+                Aucune activité pour le moment
               </Typography>
               <Typography sx={{ color: '#6b7c70', fontSize: 15 }}>
-                Notre programme d'activités arrive très bientôt
+                Les prochaines activités seront bientôt annoncées
               </Typography>
             </Box>
           ) : (
