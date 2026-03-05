@@ -8,7 +8,7 @@ import {
   Select, MenuItem, Typography, Switch, FormControlLabel, Divider,
   IconButton,
 } from '@mui/material'
-import { ArrowLeft, Save, Upload, X, Star } from 'lucide-react'
+import { ArrowLeft, Save, Upload, X } from 'lucide-react'
 import { useForm, Controller } from 'react-hook-form'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { activitesApi } from '@/api/services'
@@ -102,8 +102,8 @@ export default function ActivitesForm() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const isEditing = Boolean(id)
-  const [photo, setPhoto] = useState(null) // Une seule photo
-  const [existingPhoto, setExistingPhoto] = useState(null) // Photo existante
+  const [photos, setPhotos] = useState([])
+  const [existingPhotos, setExistingPhotos] = useState([])
 
   const { register, handleSubmit, control, reset, formState: { errors } } = useForm({
     defaultValues: {
@@ -117,13 +117,7 @@ export default function ActivitesForm() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: { 'image/*': [] },
-    onDrop: (files) => {
-      // Ne garder que la première image
-      if (files.length > 0) {
-        setPhoto(files[0])
-      }
-    },
-    maxFiles: 1, // Limiter à 1 fichier
+    onDrop: (files) => setPhotos((prev) => [...prev, ...files]),
   })
 
   // Charger l'activité en mode édition
@@ -145,9 +139,9 @@ export default function ActivitesForm() {
         section: existingData.section || 'toutes',
       })
       
-      // Stocker la photo existante si elle existe
-      if (existingData.photos && existingData.photos.length > 0) {
-        setExistingPhoto(existingData.photos[0]) // Prendre la première comme couverture
+      // Stocker les photos existantes si elles existent
+      if (existingData.photos) {
+        setExistingPhotos(existingData.photos)
       }
     }
   }, [existingData, reset])
@@ -175,10 +169,8 @@ export default function ActivitesForm() {
       }
     });
     
-    // Ajouter la nouvelle photo (une seule)
-    if (photo) {
-      formData.append('photo_couverture', photo); // Champ spécifique pour la couverture
-    }
+    // Ajouter les nouvelles photos
+    photos.forEach((f) => formData.append('photos[]', f));
     
     if (isEditing) {
       formData.append('_method', 'PUT');
@@ -187,14 +179,10 @@ export default function ActivitesForm() {
     mutation.mutate(formData);
   }
 
-  const removeExistingPhoto = () => {
-    setExistingPhoto(null)
+  const removeExistingPhoto = (photoId) => {
+    setExistingPhotos(prev => prev.filter(p => p.id !== photoId))
     // Optionnel: appeler une API pour supprimer la photo du serveur
-    // activitesApi.deletePhoto(existingPhoto.id)
-  }
-
-  const removeNewPhoto = () => {
-    setPhoto(null)
+    // activitesApi.deletePhoto(photoId)
   }
 
   if (isLoading) return <LoadingSpinner />
@@ -265,119 +253,100 @@ export default function ActivitesForm() {
               />
             </Paper>
 
-            {/* Upload Photo de couverture (une seule) */}
+            {/* Upload Photos */}
             <Paper sx={{ p: 3 }}>
-              <Typography sx={{ fontWeight: 700, fontSize: 13, mb: 2 }}>
-                Photo de couverture <span style={{ color: '#dc2626', fontSize: 11 }}>*</span>
-              </Typography>
-              <Typography sx={{ fontSize: 11.5, color: '#6b7c70', mb: 2 }}>
-                Sélectionnez une image qui représentera cette activité (une seule photo)
-              </Typography>
+              <Typography sx={{ fontWeight: 700, fontSize: 13, mb: 2 }}>Photos</Typography>
               
-              {/* Photo existante (en mode édition) */}
-              {existingPhoto && (
+              {/* Photos existantes (en mode édition) */}
+              {existingPhotos.length > 0 && (
                 <Box sx={{ mb: 3 }}>
                   <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#6b7c70', mb: 1.5 }}>
-                    Photo actuelle
+                    Photos existantes
                   </Typography>
-                  <Box sx={{ display: 'inline-block', position: 'relative' }}>
-                    <Box
-                      component="img"
-                      src={existingPhoto.thumb || existingPhoto.url}
-                      alt="Photo de couverture"
-                      sx={{
-                        width: 200, height: 150, borderRadius: '12px',
-                        objectFit: 'cover', border: '3px solid #1B7A3E',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                      }}
-                    />
-                    <Box sx={{
-                      position: 'absolute', top: -10, left: -10,
-                      background: '#1B7A3E', color: '#fff',
-                      width: 28, height: 28, borderRadius: '50%',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      border: '2px solid #fff',
-                    }}>
-                      <Star size={14} />
-                    </Box>
-                    <IconButton
-                      size="small"
-                      onClick={removeExistingPhoto}
-                      sx={{
-                        position: 'absolute', top: -8, right: -8,
-                        background: '#dc2626', color: '#fff',
-                        width: 24, height: 24,
-                        '&:hover': { background: '#b91c1c' },
-                      }}
-                    >
-                      <X size={12} />
-                    </IconButton>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
+                    {existingPhotos.map((photo) => (
+                      <Box key={photo.id} sx={{ position: 'relative' }}>
+                        <Box
+                          component="img"
+                          src={photo.thumb || photo.url}
+                          alt=""
+                          sx={{
+                            width: 80, height: 80, borderRadius: '10px',
+                            objectFit: 'cover', border: '1px solid #dae8df',
+                          }}
+                        />
+                        <IconButton
+                          size="small"
+                          onClick={() => removeExistingPhoto(photo.id)}
+                          sx={{
+                            position: 'absolute', top: -6, right: -6,
+                            background: '#dc2626', color: '#fff',
+                            width: 18, height: 18,
+                            '&:hover': { background: '#b91c1c' },
+                          }}
+                        >
+                          <X size={10} />
+                        </IconButton>
+                      </Box>
+                    ))}
                   </Box>
                 </Box>
               )}
 
-              {/* Nouvelle photo */}
-              {!existingPhoto && (
-                <Box
-                  {...getRootProps()}
-                  sx={{
-                    border: `2px dashed ${isDragActive ? '#1B7A3E' : '#dae8df'}`,
-                    borderRadius: '12px',
-                    p: 4,
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    background: isDragActive ? '#eaf4ee' : 'transparent',
-                    transition: 'all 0.2s',
-                    '&:hover': { borderColor: '#1B7A3E', background: '#f9fbf9' },
-                  }}
-                >
-                  <input {...getInputProps()} />
-                  <Upload size={28} color={isDragActive ? '#1B7A3E' : '#dae8df'} style={{ marginBottom: 8 }} />
-                  <Typography sx={{ fontSize: 13.5, color: '#6b7c70' }}>
-                    {isDragActive ? 'Déposez la photo ici' : 'Glissez une photo ou cliquez pour sélectionner'}
-                  </Typography>
-                  <Typography sx={{ fontSize: 11, color: '#9ca3af', mt: 0.5 }}>
-                    JPEG, PNG, WebP · Une seule photo acceptée
-                  </Typography>
-                </Box>
-              )}
+              <Box
+                {...getRootProps()}
+                sx={{
+                  border: `2px dashed ${isDragActive ? '#1B7A3E' : '#dae8df'}`,
+                  borderRadius: '12px',
+                  p: 4,
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  background: isDragActive ? '#eaf4ee' : 'transparent',
+                  transition: 'all 0.2s',
+                  '&:hover': { borderColor: '#1B7A3E', background: '#f9fbf9' },
+                }}
+              >
+                <input {...getInputProps()} />
+                <Upload size={28} color={isDragActive ? '#1B7A3E' : '#dae8df'} style={{ marginBottom: 8 }} />
+                <Typography sx={{ fontSize: 13.5, color: '#6b7c70' }}>
+                  {isDragActive ? 'Déposez les photos ici' : 'Glissez des photos ou cliquez pour sélectionner'}
+                </Typography>
+                <Typography sx={{ fontSize: 11, color: '#9ca3af', mt: 0.5 }}>
+                  JPEG, PNG, WebP · Max 50 Mo par fichier
+                </Typography>
+              </Box>
 
-              {photo && (
+              {photos.length > 0 && (
                 <Box sx={{ mt: 2 }}>
                   <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#6b7c70', mb: 1.5 }}>
-                    Nouvelle photo de couverture
+                    Nouvelles photos
                   </Typography>
-                  <Box sx={{ display: 'inline-block', position: 'relative' }}>
-                    <Box
-                      component="img"
-                      src={URL.createObjectURL(photo)}
-                      alt={photo.name}
-                      sx={{
-                        width: 200, height: 150, borderRadius: '12px',
-                        objectFit: 'cover', border: '3px solid #1B7A3E',
-                      }}
-                    />
-                    <Box sx={{
-                      position: 'absolute', top: -10, left: -10,
-                      background: '#1B7A3E', color: '#fff',
-                      width: 28, height: 28, borderRadius: '50%',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      border: '2px solid #fff',
-                    }}>
-                      <Star size={14} />
-                    </Box>
-                    <IconButton
-                      size="small"
-                      onClick={removeNewPhoto}
-                      sx={{
-                        position: 'absolute', top: -8, right: -8,
-                        background: '#dc2626', color: '#fff',
-                        width: 24, height: 24,
-                        '&:hover': { background: '#b91c1c' },
-                      }}
-                    >
-                      <X size={12} />
-                    </IconButton>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
+                    {photos.map((file, i) => (
+                      <Box key={i} sx={{ position: 'relative' }}>
+                        <Box
+                          component="img"
+                          src={URL.createObjectURL(file)}
+                          alt={file.name}
+                          sx={{
+                            width: 80, height: 80, borderRadius: '10px',
+                            objectFit: 'cover', border: '1px solid #dae8df',
+                          }}
+                        />
+                        <IconButton
+                          size="small"
+                          onClick={() => setPhotos((prev) => prev.filter((_, j) => j !== i))}
+                          sx={{
+                            position: 'absolute', top: -6, right: -6,
+                            background: '#dc2626', color: '#fff',
+                            width: 18, height: 18,
+                            '&:hover': { background: '#b91c1c' },
+                          }}
+                        >
+                          <X size={10} />
+                        </IconButton>
+                      </Box>
+                    ))}
                   </Box>
                 </Box>
               )}
