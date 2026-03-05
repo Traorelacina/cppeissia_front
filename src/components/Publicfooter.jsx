@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom'
 import { Box, Container, Grid, Typography, Divider } from '@mui/material'
-import { MapPin, Phone, Mail, Clock, BookOpen, ArrowUpRight } from 'lucide-react'
+import { MapPin, Phone, Mail, Clock, ArrowUpRight } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { parametresApi } from '@/api/services'
+import logo from '@/assets/logo.jpeg' // Import du logo réel
 
 // COULEUR ORANGE DU MINISTÈRE
 const ORANGE = '#FF7F27'
@@ -67,25 +68,41 @@ export default function PublicFooter() {
           {/* BLOC 1 — IDENTITÉ + CONTACT */}
           <Grid item xs={12} md={4}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
+              {/* Logo réel */}
               <Box
                 sx={{
-                  width: 40,
-                  height: 40,
-                  background: ORANGE,
-                  borderRadius: '10px',
+                  width: 50,
+                  height: 50,
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  background: '#fff',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                  border: '2px solid rgba(255,127,39,0.3)',
                 }}
               >
-                <BookOpen size={20} color="#0f4a25" strokeWidth={2.5} />
+                <img 
+                  src={logo} 
+                  alt="Logo CPPE Issia" 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'contain',
+                    display: 'block'
+                  }} 
+                />
               </Box>
               <Box>
-                <Box sx={{ color: '#fff', fontWeight: 800, fontSize: 15 }}>
+                <Box sx={{ color: '#fff', fontWeight: 800, fontSize: 18, lineHeight: 1.2 }}>
                   CPPE <span style={{ color: ORANGE }}>ISSIA</span>
                 </Box>
-                <Box sx={{ fontSize: 10, letterSpacing: '1.5px', textTransform: 'uppercase' }}>
-                  Petite Enfance
+                <Box sx={{ fontSize: 10, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
+                  Centre de Protection
+                </Box>
+                <Box sx={{ fontSize: 10, letterSpacing: '1.5px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)' }}>
+                  de la Petite Enfance
                 </Box>
               </Box>
             </Box>
@@ -195,11 +212,30 @@ export default function PublicFooter() {
       <Box sx={{ py: 2 }}>
         <Container maxWidth="lg">
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
-            <Typography sx={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>
-              © {new Date().getFullYear()} CPPE ISSIA — Ministère de la Femme, de la Famille et de l'Enfant — République de Côte d'Ivoire
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box 
+                  component="img" 
+                  src={logo} 
+                  alt="Logo" 
+                  sx={{ 
+                    width: 24, 
+                    height: 24, 
+                    objectFit: 'contain',
+                    opacity: 0.5,
+                    filter: 'brightness(0) invert(1)'
+                  }} 
+                />
+                <Typography sx={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>
+                  © {new Date().getFullYear()} CPPE ISSIA
+                </Typography>
+              </Box>
+              <Typography sx={{ fontSize: 11, color: 'rgba(255,255,255,0.2)' }}>
+                Ministère de la Femme, de la Famille et de l'Enfant
+              </Typography>
+            </Box>
             <Typography sx={{ fontSize: 11, color: 'rgba(255,255,255,0.2)' }}>
-              Portail numérique officiel · v1.0
+              République de Côte d'Ivoire
             </Typography>
           </Box>
         </Container>
