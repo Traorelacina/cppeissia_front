@@ -37,6 +37,7 @@ import { actualitesApi, parametresApi } from '@/api/services'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import ecoleImage from '../../assets/ecole.jpg'
+import { getImageUrl } from '@/utils/imageHelper'
 
 // COULEUR ORANGE DU MINISTÈRE (remplace l'ancien jaune #F5A623)
 const ORANGE = '#FF7F27'
@@ -137,6 +138,7 @@ function InfoBar({ params }) {
 // ========================
 // MOT DU DIRECTEUR
 // ========================
+
 function MotDirecteurSection({ params }) {
   const nom   = params?.nom_directeur  || 'Le Directeur'
   const photo = params?.photo_directeur
@@ -209,10 +211,22 @@ function MotDirecteurSection({ params }) {
                 zIndex: 1,
               }}
             >
-              {photo
-                ? <Box component="img" src={photo} alt={nom} sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                : <Typography sx={{ fontSize: 64, lineHeight: 1 }}>👤</Typography>
-              }
+              {photo ? (
+                <Box 
+                  component="img" 
+                  src={getImageUrl(photo)} 
+                  alt={nom} 
+                  sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  onError={(e) => {
+                    console.error('❌ Erreur chargement photo grande:', photo);
+                    e.target.style.display = 'none';
+                    e.target.parentElement.innerHTML = '<span style="font-size:64px;">👤</span>';
+                  }}
+                  onLoad={() => console.log('✅ Grande photo chargée')}
+                />
+              ) : (
+                <Typography sx={{ fontSize: 64, lineHeight: 1 }}>👤</Typography>
+              )}
             </Box>
             <Box sx={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
               <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 18, md: 20 }, fontWeight: 700, color: '#fff', lineHeight: 1.2, mb: 0.5 }}>
@@ -267,10 +281,22 @@ function MotDirecteurSection({ params }) {
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                 <Box sx={{ width: 38, height: 38, borderRadius: '50%', border: `2px solid ${ORANGE}`, overflow: 'hidden', background: '#eaf4ee', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {photo
-                    ? <Box component="img" src={photo} alt={nom} sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <Typography sx={{ fontSize: 16 }}>👤</Typography>
-                  }
+                  {photo ? (
+                    <Box 
+                      component="img" 
+                      src={getImageUrl(photo)} 
+                      alt={nom} 
+                      sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        console.error('❌ Erreur chargement photo mini:', photo);
+                        e.target.style.display = 'none';
+                        e.target.parentElement.innerHTML = '<span style="font-size:16px;">👤</span>';
+                      }}
+                      onLoad={() => console.log('✅ Mini photo chargée')}
+                    />
+                  ) : (
+                    <Typography sx={{ fontSize: 16 }}>👤</Typography>
+                  )}
                 </Box>
                 <Box>
                   <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 14, fontWeight: 700, color: '#1B7A3E', lineHeight: 1.2 }}>{nom}</Typography>
@@ -304,7 +330,6 @@ function MotDirecteurSection({ params }) {
     </Box>
   )
 }
-
 // ========================
 // FLASH INFOS
 // ========================
