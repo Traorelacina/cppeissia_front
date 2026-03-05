@@ -1,11 +1,12 @@
 // ============================================================
 // MOT DU DIRECTEUR
 // ============================================================
-import { Box, Container, Grid, Typography, Paper } from '@mui/material'
+import { Box, Container, Grid, Typography } from '@mui/material'
 import { useQuery } from '@tanstack/react-query'
 import { parametresApi } from '@/api/services'
 import { LoadingSpinner } from '@/components/common'
 import { Quote } from 'lucide-react'
+import { getImageUrl } from '@/utils/imageHelper' // IMPORTANT
 
 export default function MotDirecteur() {
   const { data, isLoading } = useQuery({
@@ -53,7 +54,17 @@ export default function MotDirecteur() {
                   }}
                 >
                   {params.photo_directeur ? (
-                    <Box component="img" src={params.photo_directeur} alt="Directeur" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <Box 
+                      component="img" 
+                      src={getImageUrl(params.photo_directeur)} 
+                      alt="Directeur" 
+                      sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={(e) => {
+                        console.error('Erreur chargement photo:', params.photo_directeur);
+                        e.target.style.display = 'none';
+                        e.target.parentElement.innerHTML = '<span>👤</span>';
+                      }}
+                    />
                   ) : (
                     <span>👤</span>
                   )}
