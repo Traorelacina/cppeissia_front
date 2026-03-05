@@ -893,14 +893,7 @@ function InscriptionCTA({ params }) {
                   </Box>
                 </Box>
               ))}
-              {isOpen && (
-                <Box sx={{ mt: 'auto', pt: 2 }}>
-                  <Button component={Link} to="/inscription" variant="contained" fullWidth endIcon={<ArrowRight size={15} />}
-                    sx={{ background: ORANGE, color: '#0f4a25', fontWeight: 800, py: 1.25, fontSize: 13, '&:hover': { background: '#e66e00' } }}>
-                    Constituer mon dossier
-                  </Button>
-                </Box>
-              )}
+            
             </Box>
           </Grid>
         </Grid>
