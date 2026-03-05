@@ -18,7 +18,7 @@ const TYPE_COLORS = {
   ferie:    { bg: '#fce4ec', color: '#c62828', label: 'Jour férié' },
   rentree:  { bg: '#dcfce7', color: '#15803d', label: 'Rentrée' },
   evenement:{ bg: '#fff3e0', color: '#7c3d00', label: 'Événement' },
-  examen:   { bg: '#f3e8ff', color: '#6b21a8', label: 'Examen' },
+ 
 }
 
 export default function CalendrierAdmin() {
