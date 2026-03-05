@@ -218,19 +218,37 @@ export default function Parametres() {
     if (data?.data?.data) setValues(data.data.data)
   }, [data])
 
-  const updateMutation = useMutation({
-    mutationFn: async (params) => {
-      for (const [cle, valeur] of Object.entries(params)) {
-        await parametresApi.update(cle, valeur)
+  // Remplacer la mutation existante par :
+
+const updateMutation = useMutation({
+  mutationFn: async (params) => {
+    const promises = [];
+    
+    for (const [cle, valeur] of Object.entries(params)) {
+      if (cle === 'photo_directeur' && valeur && valeur.startsWith('data:image')) {
+        // Pour la photo, utiliser la route spéciale
+        const formData = new FormData();
+        // Convertir base64 en blob si nécessaire ou envoyer directement
+        formData.append('valeur', valeur);
+        promises.push(parametresApi.uploadPhotoDirecteur(formData));
+      } else {
+        // Pour les autres champs, utiliser la route standard
+        promises.push(parametresApi.update(cle, valeur));
       }
-    },
-    onSuccess: () => {
-      toast.success('Paramètres sauvegardés.')
-      setSaved(true)
-      setTimeout(() => setSaved(false), 3000)
-    },
-    onError: () => toast.error('Erreur lors de la sauvegarde.'),
-  })
+    }
+    
+    await Promise.all(promises);
+  },
+  onSuccess: () => {
+    toast.success('Paramètres sauvegardés.');
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  },
+  onError: (err) => {
+    console.error('Erreur sauvegarde:', err);
+    toast.error('Erreur lors de la sauvegarde.');
+  },
+});
 
   const handleChange = (cle, val) =>
     setValues((prev) => ({ ...prev, [cle]: val }))
