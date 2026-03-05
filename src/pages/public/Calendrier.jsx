@@ -6,6 +6,8 @@ import { CalendarDays } from 'lucide-react'
 import { format, parseISO } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
+const ORANGE = '#FF7F27'
+
 const TYPE_CONFIG = {
   vacances:  { bg: '#dbeafe', color: '#1d4ed8', label: 'Vacances' },
   ferie:     { bg: '#fce4ec', color: '#c62828', label: 'Jour férié' },
@@ -14,7 +16,6 @@ const TYPE_CONFIG = {
   examen:    { bg: '#f3e8ff', color: '#6b21a8', label: 'Examen' },
 }
 
-// Groupe les événements par mois
 function groupByMonth(events) {
   const months = {}
   events.forEach((ev) => {
@@ -31,7 +32,7 @@ export default function Calendrier() {
     queryFn:  () => calendrierApi.getAll(),
   })
 
-  const events = data?.data?.data || []
+  const events  = data?.data?.data || []
   const grouped = groupByMonth(events)
 
   return (
@@ -40,7 +41,7 @@ export default function Calendrier() {
       <Box sx={{ background: 'linear-gradient(135deg, #0f4a25, #1B7A3E)', py: { xs: 8, md: 11 }, px: 3, textAlign: 'center' }}>
         <Container maxWidth="md">
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-            <Box sx={{ width: 56, height: 56, background: '#F5A623', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Box sx={{ width: 56, height: 56, background: ORANGE, borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <CalendarDays size={26} color="#0f4a25" />
             </Box>
           </Box>
@@ -89,34 +90,15 @@ export default function Calendrier() {
                     {/* Événements */}
                     <Box sx={{ p: 0 }}>
                       {evs.map((ev, idx) => {
-                        const tc = TYPE_CONFIG[ev.type] || TYPE_CONFIG.evenement
+                        const tc    = TYPE_CONFIG[ev.type] || TYPE_CONFIG.evenement
                         const debut = ev.date_debut ? parseISO(ev.date_debut) : null
                         const fin   = ev.date_fin   ? parseISO(ev.date_fin)   : null
                         return (
                           <Box key={ev.id}>
                             {idx > 0 && <Divider />}
-                            <Box
-                              sx={{
-                                display: 'flex',
-                                gap: 2,
-                                alignItems: 'flex-start',
-                                p: 2.5,
-                                '&:hover': { background: '#f9fbf9' },
-                                transition: 'background 0.15s',
-                              }}
-                            >
+                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', p: 2.5, '&:hover': { background: '#f9fbf9' }, transition: 'background 0.15s' }}>
                               {/* Date badge */}
-                              <Box
-                                sx={{
-                                  minWidth: 48,
-                                  textAlign: 'center',
-                                  background: tc.bg,
-                                  borderRadius: '10px',
-                                  py: 1,
-                                  px: 0.5,
-                                  flexShrink: 0,
-                                }}
-                              >
+                              <Box sx={{ minWidth: 48, textAlign: 'center', background: tc.bg, borderRadius: '10px', py: 1, px: 0.5, flexShrink: 0 }}>
                                 {debut && (
                                   <>
                                     <Typography sx={{ fontSize: 18, fontWeight: 800, color: tc.color, lineHeight: 1 }}>

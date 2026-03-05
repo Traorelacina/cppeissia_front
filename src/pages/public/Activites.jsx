@@ -1,14 +1,16 @@
 // ============================================================
-// ACTIVITES LIST - redesign éditorial
+// ACTIVITES LIST - redesign éditorial épuré (sans sections)
 // ============================================================
 import { useState } from 'react'
-import { Box, Container, Grid, Typography, Chip, Select, MenuItem, FormControl } from '@mui/material'
+import { Box, Container, Grid, Typography, Chip } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { activitesApi } from '@/api/services'
 import { LoadingSpinner } from '@/components/common'
-import { ArrowRight, Sparkles, Camera, ChevronDown } from 'lucide-react'
+import { ArrowRight, Sparkles, Camera } from 'lucide-react'
 import { getImageUrl } from '@/utils/imageHelper'
+
+const ORANGE = '#FF7F27'
 
 const ACT_STYLES = `
   @keyframes fadeInUp {
@@ -18,10 +20,6 @@ const ACT_STYLES = `
   @keyframes pulse-dot {
     0%, 100% { box-shadow: 0 0 0 0 rgba(255,127,39,0.5); }
     50%       { box-shadow: 0 0 0 8px rgba(255,127,39,0); }
-  }
-  @keyframes lineGrow {
-    from { width: 0; }
-    to   { width: 56px; }
   }
   .act-card { animation: fadeInUp 0.55s ease both; }
   .act-card:nth-child(1) { animation-delay: 0.05s; }
@@ -35,39 +33,14 @@ const ACT_STYLES = `
   .act-card-wrap:hover .act-img { transform: scale(1.07); }
   .act-overlay { transition: opacity 0.3s; opacity: 0; }
   .act-card-wrap:hover .act-overlay { opacity: 1; }
-  .act-arrow { transition: transform 0.2s, gap 0.2s; }
+  .act-arrow { transition: transform 0.2s; }
   .act-link:hover .act-arrow { transform: translateX(4px); }
 `
 
-const SECTIONS = [
-  { val: '',               label: 'Toutes les sections' },
-  { val: 'creche',         label: 'Crèche' },
-  { val: 'petite_section', label: 'Petite Section' },
-  { val: 'moyenne_section',label: 'Moyenne Section' },
-  { val: 'grande_section', label: 'Grande Section' },
-  { val: 'toutes',         label: 'Toutes sections' },
-]
-
-const SECTION_META = {
-  creche:          { bg: '#fce4ec', color: '#a11460', dot: '#e91e8c', label: 'Crèche' },
-  petite_section:  { bg: '#fff3e0', color: '#b87b0f', dot: '#FF7F27', label: 'Petite Section' },
-  moyenne_section: { bg: '#eaf4ee', color: '#1B7A3E', dot: '#4CAF50', label: 'Moyenne Section' },
-  grande_section:  { bg: '#f3e8ff', color: '#6b21a8', dot: '#9c27b0', label: 'Grande Section' },
-  toutes:          { bg: '#e8eaf6', color: '#3949ab', dot: '#5c6bc0', label: 'Toutes sections' },
-}
-
-const ORANGE = '#FF7F27'
-
 function ActCard({ act, index }) {
-  const sc = SECTION_META[act.section] || { bg: '#f3f4f6', color: '#374151', dot: '#9e9e9e', label: act.section }
   const isFeatured = index === 0
   const [imageError, setImageError] = useState(false)
-
   const imageUrl = act.photo_couverture ? getImageUrl(act.photo_couverture) : null
-
-  const handleImageError = () => {
-    setImageError(true)
-  }
 
   return (
     <Box className="act-card" sx={{ height: '100%' }}>
@@ -89,12 +62,12 @@ function ActCard({ act, index }) {
           },
         }}
       >
-        {/* IMAGE */}
+        {/* ── IMAGE ── */}
         <Box sx={{
           position: 'relative', overflow: 'hidden', flexShrink: 0,
           height: isFeatured ? { xs: 320, md: '100%' } : 300,
           width: isFeatured ? { xs: '100%', md: '50%' } : '100%',
-          background: sc.bg,
+          background: '#eaf4ee',
           minHeight: isFeatured ? { md: 420 } : 'auto',
         }}>
           {imageUrl && !imageError ? (
@@ -103,30 +76,17 @@ function ActCard({ act, index }) {
               src={imageUrl}
               alt={act.titre}
               className="act-img"
-              onError={handleImageError}
+              onError={() => setImageError(true)}
               sx={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0, display: 'block' }}
             />
           ) : (
-            <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: sc.bg }}>
-              <Sparkles size={isFeatured ? 64 : 44} color={sc.color} style={{ opacity: 0.18 }} />
+            <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#eaf4ee' }}>
+              <Sparkles size={isFeatured ? 64 : 44} color="#1B7A3E" style={{ opacity: 0.15 }} />
             </Box>
           )}
 
-          <Box className="act-overlay" sx={{ position: 'absolute', inset: 0, background: `linear-gradient(135deg, ${sc.color}cc, rgba(0,0,0,0.4))` }} />
-
-          {/* Badge section */}
-          <Box sx={{
-            position: 'absolute', top: 14, left: 14,
-            display: 'flex', alignItems: 'center', gap: 0.75,
-            px: 1.5, py: 0.5, borderRadius: '20px',
-            background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(8px)',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.12)',
-          }}>
-            <Box sx={{ width: 6, height: 6, borderRadius: '50%', background: sc.dot, flexShrink: 0 }} />
-            <Typography sx={{ fontSize: 10.5, fontWeight: 700, color: sc.color, letterSpacing: '0.5px' }}>
-              {sc.label}
-            </Typography>
-          </Box>
+          {/* Overlay hover */}
+          <Box className="act-overlay" sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(15,74,37,0.75), rgba(0,0,0,0.35))' }} />
 
           {/* Compteur photos */}
           {act.media_count > 0 && (
@@ -143,6 +103,7 @@ function ActCard({ act, index }) {
             </Box>
           )}
 
+          {/* Numéro décoratif carte vedette */}
           {isFeatured && (
             <Box sx={{
               position: 'absolute', bottom: -12, right: -8,
@@ -155,7 +116,7 @@ function ActCard({ act, index }) {
           )}
         </Box>
 
-        {/* CONTENU */}
+        {/* ── CONTENU ── */}
         <Box sx={{ p: isFeatured ? { xs: 3, md: 4 } : 3, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <Box>
             {isFeatured && (
@@ -166,6 +127,7 @@ function ActCard({ act, index }) {
                 </Typography>
               </Box>
             )}
+
             <Typography sx={{
               fontFamily: "'Cormorant Garamond', serif",
               fontSize: isFeatured ? { xs: 28, md: 38 } : { xs: 22, md: 26 },
@@ -173,6 +135,7 @@ function ActCard({ act, index }) {
             }}>
               {act.titre}
             </Typography>
+
             <Box
               sx={{
                 fontSize: 14.5, color: '#6b7c70', lineHeight: 1.85,
@@ -216,11 +179,9 @@ function ActCard({ act, index }) {
 }
 
 export default function Activites() {
-  const [section, setSection] = useState('')
-
   const { data, isLoading } = useQuery({
-    queryKey: ['activites-public', section],
-    queryFn:  () => activitesApi.getAll({ section: section || undefined }),
+    queryKey: ['activites-public'],
+    queryFn:  () => activitesApi.getAll(),
   })
 
   const activites = data?.data?.data?.data || []
@@ -235,11 +196,13 @@ export default function Activites() {
         pt: { xs: 9, md: 12 }, pb: { xs: 7, md: 9 },
         position: 'relative', overflow: 'hidden',
       }}>
+        {/* Grille de fond */}
         <Box sx={{
           position: 'absolute', inset: 0,
           backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
           backgroundSize: '48px 48px', pointerEvents: 'none',
         }} />
+        {/* Halos décoratifs */}
         <Box sx={{ position: 'absolute', width: 700, height: 700, right: -250, top: -250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,127,39,0.09) 0%, transparent 65%)', pointerEvents: 'none' }} />
         <Box sx={{ position: 'absolute', width: 400, height: 400, left: -100, bottom: -100, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,195,74,0.06) 0%, transparent 65%)', pointerEvents: 'none' }} />
 
@@ -273,16 +236,15 @@ export default function Activites() {
                 lineHeight: 1.8, maxWidth: 480,
                 borderLeft: `3px solid ${ORANGE}`, pl: 2,
               }}>
-                Découvrez toutes les activités éducatives, artistiques et sportives proposées par le CPPE d'Issia — de la Crèche à la Grande Section.
+                Découvrez toutes les activités éducatives, artistiques et sportives proposées par le CPPE d'Issia.
               </Typography>
             </Box>
 
             {/* Stats rapides */}
             <Box sx={{ display: 'flex', gap: 2, flexShrink: 0, flexWrap: 'wrap' }}>
               {[
-                { num: '4', label: 'Sections' },
                 { num: '+20', label: 'Activités' },
-                { num: '∞', label: 'Souvenirs' },
+                { num: '∞',   label: 'Souvenirs' },
               ].map(({ num, label }) => (
                 <Box key={label} sx={{
                   px: 2.5, py: 2, borderRadius: '16px',
@@ -306,48 +268,17 @@ export default function Activites() {
       <Box sx={{ py: 8, background: '#f4f8f5' }}>
         <Container maxWidth="lg">
 
-          {/* Barre filtre */}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2, mb: 5 }}>
-            <Box>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
-                <Box sx={{ width: 28, height: 2, background: ORANGE }} />
-                <Typography sx={{ fontSize: 11, fontWeight: 700, color: ORANGE, letterSpacing: '3px', textTransform: 'uppercase' }}>
-                  Catalogue
-                </Typography>
-              </Box>
-              <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 22, md: 32 }, fontWeight: 700, color: '#0c1a10' }}>
-                {section
-                  ? `Section : ${SECTIONS.find(s => s.val === section)?.label}`
-                  : 'Toutes les activités'}
+          {/* Titre de section */}
+          <Box sx={{ mb: 5 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+              <Box sx={{ width: 28, height: 2, background: ORANGE }} />
+              <Typography sx={{ fontSize: 11, fontWeight: 700, color: ORANGE, letterSpacing: '3px', textTransform: 'uppercase' }}>
+                Catalogue
               </Typography>
             </Box>
-
-            <FormControl size="small">
-              <Select
-                value={section}
-                onChange={(e) => setSection(e.target.value)}
-                displayEmpty
-                IconComponent={ChevronDown}
-                sx={{
-                  minWidth: 210, background: '#fff', borderRadius: '30px',
-                  fontSize: 13, fontWeight: 600,
-                  '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(27,122,62,0.2)', borderWidth: '1.5px' },
-                  '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#1B7A3E' },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#1B7A3E' },
-                  '& .MuiSelect-select': { py: 1.2, pl: 2 },
-                  '& .MuiSvgIcon-root, & svg': { color: '#1B7A3E', mr: 0.5 },
-                }}
-              >
-                {SECTIONS.map(({ val, label }) => (
-                  <MenuItem key={val} value={val} sx={{ fontSize: 13, fontWeight: val === section ? 700 : 400 }}>
-                    {val && (
-                      <Box sx={{ width: 8, height: 8, borderRadius: '50%', background: SECTION_META[val]?.dot || '#9e9e9e', mr: 1.25, flexShrink: 0, display: 'inline-block' }} />
-                    )}
-                    {label}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 22, md: 32 }, fontWeight: 700, color: '#0c1a10' }}>
+              Toutes les activités
+            </Typography>
           </Box>
 
           {/* Contenu */}
@@ -362,7 +293,7 @@ export default function Activites() {
                 Aucune activité
               </Typography>
               <Typography sx={{ color: '#6b7c70', fontSize: 14 }}>
-                Aucune activité disponible pour cette section.
+                Aucune activité disponible pour le moment.
               </Typography>
             </Box>
           ) : (
