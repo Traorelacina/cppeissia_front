@@ -185,6 +185,7 @@ export default function Activites() {
   })
 
   const activites = data?.data?.data?.data || []
+  const totalActivites = activites.length
 
   return (
     <Box>
@@ -240,10 +241,10 @@ export default function Activites() {
               </Typography>
             </Box>
 
-            {/* Stats rapides */}
+            {/* Stats rapides - MODIFIÉ : affiche le nombre réel d'activités */}
             <Box sx={{ display: 'flex', gap: 2, flexShrink: 0, flexWrap: 'wrap' }}>
               {[
-                { num: '+20', label: 'Activités' },
+                { num: totalActivites.toString(), label: 'Activités' },
                 { num: '∞',   label: 'Souvenirs' },
               ].map(({ num, label }) => (
                 <Box key={label} sx={{
@@ -268,7 +269,7 @@ export default function Activites() {
       <Box sx={{ py: 8, background: '#f4f8f5' }}>
         <Container maxWidth="lg">
 
-          {/* Titre de section */}
+          {/* Titre de section - MODIFIÉ : affiche le nombre réel d'activités */}
           <Box sx={{ mb: 5 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
               <Box sx={{ width: 28, height: 2, background: ORANGE }} />
@@ -277,7 +278,7 @@ export default function Activites() {
               </Typography>
             </Box>
             <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 22, md: 32 }, fontWeight: 700, color: '#0c1a10' }}>
-              Toutes les activités
+              {totalActivites} activité{totalActivites > 1 ? 's' : ''} disponible{totalActivites > 1 ? 's' : ''}
             </Typography>
           </Box>
 
