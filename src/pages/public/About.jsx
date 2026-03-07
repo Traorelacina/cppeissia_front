@@ -12,7 +12,6 @@ export function About() {
   const valeurs = [
     { icon: Heart,  titre: 'Bienveillance', texte: "Chaque enfant est accueilli dans un environnement chaleureux, sécurisé et propice à son épanouissement." },
     { icon: Shield, titre: 'Protection',    texte: "Nous garantissons la sécurité physique et affective de chaque enfant confié à notre établissement." },
-    { icon: Users,  titre: 'Inclusion',     texte: "Tous les enfants, quelles que soient leurs différences, méritent les mêmes chances d'apprentissage." },
     { icon: Star,   titre: 'Excellence',    texte: "Une équipe pédagogique qualifiée, engagée dans la formation continue et la qualité de l'enseignement." },
   ]
 
@@ -127,9 +126,13 @@ export function About() {
         <Container maxWidth="lg">
           <SectionHeader eyebrow="Nos valeurs" title="Ce qui nous guide" centered />
 
-          <Grid container spacing={3} sx={{ mt: 3 }}>
+          <Grid
+            container
+            spacing={3}
+            sx={{ mt: 3, justifyContent: 'center' }}
+          >
             {valeurs.map(({ icon: Icon, titre, texte }, index) => (
-              <Grid item xs={12} sm={6} md={3} key={index}>
+              <Grid item xs={12} sm={6} md={4} key={index}>
                 <Box sx={{
                   background: '#fff', borderRadius: '24px', p: 4, height: '100%',
                   border: '1px solid #e0ebe4', transition: 'all 0.4s ease',

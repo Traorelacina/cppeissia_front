@@ -1,8 +1,8 @@
 // ============================================================
 // ACTIVITES LIST - Activités de l'école (événements, sorties, ateliers)
 // ============================================================
-import { useState } from 'react'
-import { Box, Container, Grid, Typography, Chip, Avatar, IconButton } from '@mui/material'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Box, Container, Typography, Chip, IconButton } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { activitesApi } from '@/api/services'
@@ -12,256 +12,167 @@ import {
   Sparkles, 
   Camera, 
   Calendar,
-  Users,
   MapPin,
-  Heart,
-  BookOpen,
-  Star,
-  Image as ImageIcon
+  Image as ImageIcon,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Pause,
+  Play,
 } from 'lucide-react'
 import { getImageUrl } from '@/utils/imageHelper'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 
 const ORANGE = '#FF7F27'
+const GREEN  = '#1B7A3E'
 
 const ACT_STYLES = `
-  @keyframes fadeInScale {
-    from { opacity: 0; transform: scale(0.96); }
-    to { opacity: 1; transform: scale(1); }
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,127,39,0.5); }
+    50%       { box-shadow: 0 0 0 6px rgba(255,127,39,0); }
   }
-  
-  @keyframes slideInRight {
-    from { opacity: 0; transform: translateX(30px); }
-    to { opacity: 1; transform: translateX(0); }
+
+  .act-track {
+    display: flex;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
   }
-  
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+
+  .act-slide {
+    flex: 0 0 auto;
+    padding: 0 10px;
+    box-sizing: border-box;
   }
-  
-  @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,127,39,0.4); }
-    50% { box-shadow: 0 0 0 10px rgba(255,127,39,0); }
+
+  .act-card-inner {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(27,122,62,0.08);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    box-shadow: 0 6px 20px -6px rgba(27,122,62,0.12);
+    transition: box-shadow 0.35s ease, transform 0.35s ease;
   }
-  
-  .act-card {
-    animation: fadeInScale 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+  .act-card-inner:hover {
+    box-shadow: 0 22px 48px -10px rgba(27,122,62,0.28);
+    transform: translateY(-6px);
   }
-  
-  .act-card:nth-child(1) { animation-delay: 0.1s; }
-  .act-card:nth-child(2) { animation-delay: 0.2s; }
-  .act-card:nth-child(3) { animation-delay: 0.3s; }
-  .act-card:nth-child(4) { animation-delay: 0.4s; }
-  .act-card:nth-child(5) { animation-delay: 0.5s; }
-  .act-card:nth-child(6) { animation-delay: 0.6s; }
-  
-  .act-media-gallery {
-    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  .act-card-inner:hover .act-img {
+    transform: scale(1.06);
   }
-  
-  .act-media-gallery:hover {
-    transform: scale(1.02);
+
+  .act-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.7s cubic-bezier(0.4,0,0.2,1);
   }
-  
-  .act-category-chip {
+
+  .nav-btn {
+    transition: all 0.25s ease !important;
+  }
+  .nav-btn:hover  { transform: scale(1.08); }
+  .nav-btn:active { transform: scale(0.95); }
+
+  .carousel-dot {
     transition: all 0.3s ease;
+    cursor: pointer;
   }
-  
-  .act-category-chip:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(255,127,39,0.3);
-  }
+  .carousel-dot:hover { opacity: 0.75; }
 `
 
-function ActMediaGallery({ act }) {
-  const [imageError, setImageError] = useState({})
-  const imageUrl = act.photo_couverture ? getImageUrl(act.photo_couverture) : null
-  
-  return (
-    <Box sx={{ position: 'relative', height: '100%', minHeight: 280 }}>
-      {/* Image principale */}
-      <Box
-        className="act-media-gallery"
-        sx={{
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-          borderRadius: '20px',
-          overflow: 'hidden',
-          background: 'linear-gradient(145deg, #f0f7f2, #e0ebe4)',
-          boxShadow: '0 20px 40px -12px rgba(27,122,62,0.25)',
-        }}
-      >
-        {imageUrl && !imageError[act.id] ? (
-          <>
-            <Box
-              component="img"
-              src={imageUrl}
-              alt={act.titre}
-              onError={() => setImageError(prev => ({ ...prev, [act.id]: true }))}
-              sx={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-                '&:hover': { transform: 'scale(1.08)' },
-              }}
-            />
-            {/* Overlay gradient */}
-            <Box sx={{
-              position: 'absolute',
-              inset: 0,
-              background: 'linear-gradient(to top, rgba(12,26,16,0.4) 0%, transparent 50%, rgba(12,26,16,0.2) 100%)',
-              opacity: 0.6,
-              transition: 'opacity 0.3s',
-              '&:hover': { opacity: 0.8 },
-            }} />
-          </>
-        ) : (
-          <Box sx={{
-            position: 'absolute',
-            inset: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 1,
-          }}>
-            <ImageIcon size={48} color="#1B7A3E" style={{ opacity: 0.2 }} />
-            <Typography sx={{ color: '#1B7A3E', opacity: 0.4, fontSize: 13, fontWeight: 500 }}>
-              Image à venir
-            </Typography>
-          </Box>
-        )}
-      </Box>
-
-      {/* Badge médias flottant */}
-      {act.media_count > 0 && (
-        <Box sx={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0.75,
-          px: 1.75,
-          py: 0.75,
-          borderRadius: '30px',
-          background: 'rgba(12,26,16,0.85)',
-          backdropFilter: 'blur(8px)',
-          border: '1px solid rgba(255,255,255,0.15)',
-          zIndex: 2,
-          animation: 'float 4s ease-in-out infinite',
-        }}>
-          <Camera size={14} color="#fff" />
-          <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#fff' }}>
-            {act.media_count} {act.media_count > 1 ? 'photos' : 'photo'}
-          </Typography>
-        </Box>
-      )}
-    </Box>
-  )
-}
-
-function ActCard({ act, index, variant = 'default' }) {
-  const [isHovered, setIsHovered] = useState(false)
-  const isFeatured = index === 0 && variant === 'featured'
-  
-  // Formater la date
-  const dateFormatee = act.date_activite 
-    ? format(new Date(act.date_activite), 'dd MMMM yyyy', { locale: fr })
-    : 'Date à confirmer'
-
-  // Déterminer si c'est une activité à venir ou passée
+/* ─── Carte individuelle ─── */
+function ActCard({ act, cardWidth }) {
+  const [imgErr, setImgErr] = useState(false)
+  const imageUrl  = act.photo_couverture ? getImageUrl(act.photo_couverture) : null
   const isUpcoming = act.date_activite && new Date(act.date_activite) > new Date()
 
+  const dateFormatee = act.date_activite
+    ? format(new Date(act.date_activite), 'dd MMM yyyy', { locale: fr })
+    : 'Date à confirmer'
+
   return (
-    <Box 
-      className="act-card"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      sx={{ height: '100%' }}
-    >
-      <Box sx={{
-        position: 'relative',
-        height: '100%',
-        background: '#fff',
-        borderRadius: isFeatured ? '32px' : '28px',
-        overflow: 'hidden',
-        boxShadow: isHovered 
-          ? '0 30px 60px -15px rgba(27,122,62,0.3)' 
-          : '0 15px 35px -10px rgba(27,122,62,0.15)',
-        transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-        border: '1px solid rgba(27,122,62,0.08)',
-        display: 'flex',
-        flexDirection: 'column',
-        transform: isHovered ? 'translateY(-8px)' : 'none',
-      }}>
-        {/* Badge "À la une" pour la première activité */}
-        {isFeatured && (
-          <Box sx={{
-            position: 'absolute',
-            top: 20,
-            left: 20,
-            zIndex: 10,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-            px: 2,
-            py: 1,
-            borderRadius: '30px',
-            background: ORANGE,
-            boxShadow: `0 8px 20px ${ORANGE}60`,
-          }}>
-            <Star size={14} color="#0f4a25" fill="#0f4a25" />
-            <Typography sx={{ fontSize: 11, fontWeight: 800, color: '#0f4a25', letterSpacing: '0.5px' }}>
-              ACTIVITÉ PHARE
-            </Typography>
-          </Box>
-        )}
+    <div className="act-slide" style={{ width: cardWidth }}>
+      <div className="act-card-inner" style={{ minHeight: 375 }}>
 
-        {/* Badge "À venir" pour les activités futures */}
-        {isUpcoming && !isFeatured && (
-          <Box sx={{
-            position: 'absolute',
-            top: 20,
-            left: 20,
-            zIndex: 10,
-            px: 1.5,
-            py: 0.5,
-            borderRadius: '20px',
-            background: '#1B7A3E',
-            color: '#fff',
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: '0.5px',
-            boxShadow: '0 4px 12px rgba(27,122,62,0.3)',
-          }}>
-            À VENIR
-          </Box>
-        )}
-
-        {/* Section média */}
-        <Box sx={{ p: 2, pb: 0 }}>
-          <ActMediaGallery act={act} />
-        </Box>
-
-        {/* Contenu */}
-        <Box sx={{ p: 3, pt: 2.5, flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* Date et lieu (si disponible) */}
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1.5 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <Calendar size={14} color={ORANGE} />
-              <Typography sx={{ fontSize: 12, color: '#6b7c70' }}>
-                {dateFormatee}
+        {/* IMAGE */}
+        <Box sx={{ position: 'relative', height: 190, flexShrink: 0, overflow: 'hidden' }}>
+          {imageUrl && !imgErr ? (
+            <>
+              <img
+                className="act-img"
+                src={imageUrl}
+                alt={act.titre}
+                onError={() => setImgErr(true)}
+              />
+              <Box sx={{
+                position: 'absolute', inset: 0,
+                background: 'linear-gradient(to top, rgba(10,26,14,0.45) 0%, transparent 55%)',
+                pointerEvents: 'none',
+              }} />
+            </>
+          ) : (
+            <Box sx={{
+              width: '100%', height: '100%',
+              background: 'linear-gradient(145deg, #f0f7f2, #e0ebe4)',
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'center', gap: 0.75,
+            }}>
+              <ImageIcon size={32} color={GREEN} style={{ opacity: 0.18 }} />
+              <Typography sx={{ color: GREEN, opacity: 0.35, fontSize: 11, fontWeight: 500 }}>
+                Image à venir
               </Typography>
             </Box>
+          )}
+
+          {/* Badge À VENIR */}
+          {isUpcoming && (
+            <Box sx={{
+              position: 'absolute', top: 11, left: 11,
+              px: 1.1, py: 0.35, borderRadius: '10px',
+              background: GREEN, color: '#fff',
+              fontSize: 9.5, fontWeight: 700, letterSpacing: '0.5px',
+              boxShadow: '0 3px 10px rgba(27,122,62,0.35)',
+            }}>
+              À VENIR
+            </Box>
+          )}
+
+          {/* Badge photos */}
+          {act.media_count > 0 && (
+            <Box sx={{
+              position: 'absolute', top: 11, right: 11,
+              display: 'flex', alignItems: 'center', gap: 0.5,
+              px: 1, py: 0.35, borderRadius: '14px',
+              background: 'rgba(10,26,14,0.78)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255,255,255,0.14)',
+            }}>
+              <Camera size={11} color="#fff" />
+              <Typography sx={{ fontSize: 10.5, fontWeight: 600, color: '#fff' }}>
+                {act.media_count} {act.media_count > 1 ? 'photos' : 'photo'}
+              </Typography>
+            </Box>
+          )}
+        </Box>
+
+        {/* CONTENU */}
+        <Box sx={{ p: 2.25, pt: 1.75, flex: 1, display: 'flex', flexDirection: 'column' }}>
+
+          {/* Meta date + lieu */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.85, flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.45 }}>
+              <Calendar size={12} color={ORANGE} />
+              <Typography sx={{ fontSize: 11, color: '#6b7c70' }}>{dateFormatee}</Typography>
+            </Box>
             {act.lieu && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <MapPin size={14} color={ORANGE} />
-                <Typography sx={{ fontSize: 12, color: '#6b7c70' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.4 }}>
+                <MapPin size={12} color={ORANGE} />
+                <Typography sx={{ fontSize: 11, color: '#6b7c70', maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {act.lieu}
                 </Typography>
               </Box>
@@ -269,19 +180,11 @@ function ActCard({ act, index, variant = 'default' }) {
           </Box>
 
           {/* Titre */}
-          <Typography
-            variant="h3"
-            sx={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontSize: isFeatured ? 32 : 26,
-              fontWeight: 700,
-              lineHeight: 1.2,
-              mb: 1.5,
-              color: '#0c1a10',
-              transition: 'color 0.3s',
-              '&:hover': { color: ORANGE },
-            }}
-          >
+          <Typography sx={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: 19, fontWeight: 700, lineHeight: 1.22,
+            mb: 0.85, color: '#0c1a10',
+          }}>
             <Link to={`/activites/${act.slug}`} style={{ textDecoration: 'none', color: 'inherit' }}>
               {act.titre}
             </Link>
@@ -290,111 +193,218 @@ function ActCard({ act, index, variant = 'default' }) {
           {/* Description */}
           <Box
             sx={{
-              fontSize: 14,
-              color: '#5a6b5e',
-              lineHeight: 1.7,
-              mb: 2,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
+              fontSize: 12.5, color: '#5a6b5e', lineHeight: 1.6, mb: 1.5,
+              display: '-webkit-box', WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical', overflow: 'hidden',
             }}
-            dangerouslySetInnerHTML={{ 
-              __html: act.description?.substring(0, 120) + (act.description?.length > 120 ? '...' : '') || '' 
+            dangerouslySetInnerHTML={{
+              __html: act.description?.substring(0, 95) + (act.description?.length > 95 ? '…' : '') || '',
             }}
           />
 
-          {/* Footer avec actions */}
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            mt: 'auto',
-            pt: 2,
-            borderTop: '1px solid rgba(27,122,62,0.08)',
-          }}>
-            {/* Auteur / Organisateur */}
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Avatar
-                sx={{
-                  width: 32,
-                  height: 32,
-                  bgcolor: ORANGE,
-                  fontSize: 14,
-                  fontWeight: 700,
-                }}
-              >
-                {act.auteur?.name?.charAt(0) || 'CP'}
-              </Avatar>
-              <Box>
-                <Typography sx={{ fontSize: 11, color: '#6b7c70', lineHeight: 1 }}>
-                  Organisé par
-                </Typography>
-                <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#0c1a10' }}>
-                  {act.auteur?.name || 'Équipe pédagogique'}
-                </Typography>
-              </Box>
-            </Box>
-
-            {/* Bouton découverte */}
-            <Link 
-              to={`/activites/${act.slug}`}
-              style={{ textDecoration: 'none' }}
-            >
+          {/* Bouton */}
+          <Box sx={{ mt: 'auto', pt: 1.25, borderTop: '1px solid rgba(27,122,62,0.07)', display: 'flex', justifyContent: 'flex-end' }}>
+            <Link to={`/activites/${act.slug}`} style={{ textDecoration: 'none' }}>
               <Box sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.75,
-                px: 2,
-                py: 1,
-                borderRadius: '30px',
-                background: isHovered ? ORANGE : 'transparent',
-                border: `1.5px solid ${isHovered ? ORANGE : 'rgba(27,122,62,0.2)'}`,
-                transition: 'all 0.3s',
-                cursor: 'pointer',
+                display: 'inline-flex', alignItems: 'center', gap: 0.55,
+                px: 1.5, py: 0.6, borderRadius: '14px',
+                border: '1.5px solid rgba(27,122,62,0.22)',
+                fontSize: 11.5, fontWeight: 700, color: GREEN,
+                transition: 'all 0.25s',
+                '&:hover': { background: ORANGE, borderColor: ORANGE, color: '#0f4a25' },
               }}>
-                <Typography sx={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: isHovered ? '#0f4a25' : '#1B7A3E',
-                  transition: 'color 0.3s',
-                }}>
-                  Voir l'activité
-                </Typography>
-                <ArrowRight 
-                  size={14} 
-                  color={isHovered ? '#0f4a25' : '#1B7A3E'}
-                  style={{ 
-                    transition: 'transform 0.3s',
-                    transform: isHovered ? 'translateX(4px)' : 'none',
-                  }}
-                />
+                Voir l'activité
+                <ArrowRight size={12} />
               </Box>
             </Link>
           </Box>
         </Box>
+      </div>
+    </div>
+  )
+}
+
+/* ─── Carrousel ─── */
+function Carousel({ activites }) {
+  const [current, setCurrent] = useState(0)
+  const [playing, setPlaying] = useState(true)
+  const [cardW,   setCardW]   = useState(320)
+  const [visible, setVisible] = useState(3)
+  const containerRef          = useRef(null)
+  const timerRef              = useRef(null)
+
+  // Tri du plus récent au plus ancien
+  const sorted = [...activites].sort((a, b) => {
+    if (!a.date_activite) return 1
+    if (!b.date_activite) return -1
+    return new Date(b.date_activite) - new Date(a.date_activite)
+  })
+
+  const getVisible = useCallback((w) => {
+    if (w < 600)  return 1
+    if (w < 900)  return 2
+    if (w < 1200) return 3
+    return 4
+  }, [])
+
+  const maxIndex = Math.max(0, sorted.length - visible)
+
+  // Responsive : recalcul largeur carte
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const update = () => {
+      const w = el.clientWidth
+      const v = getVisible(w)
+      setVisible(v)
+      setCardW(Math.floor(w / v))
+    }
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [getVisible])
+
+  // Clamp current si maxIndex change
+  useEffect(() => {
+    setCurrent(c => Math.min(c, maxIndex))
+  }, [maxIndex])
+
+  // Démarrer / arrêter le timer
+  const startTimer = useCallback(() => {
+    clearInterval(timerRef.current)
+    timerRef.current = setInterval(() => {
+      setCurrent(c => (c >= maxIndex ? 0 : c + 1))
+    }, 3500)
+  }, [maxIndex])
+
+  useEffect(() => {
+    if (playing) startTimer()
+    else clearInterval(timerRef.current)
+    return () => clearInterval(timerRef.current)
+  }, [playing, startTimer])
+
+  const goTo = (idx) => {
+    const clamped = Math.max(0, Math.min(idx, maxIndex))
+    setCurrent(clamped)
+    if (playing) startTimer() // reset timer
+  }
+  const prev = () => goTo(current === 0 ? maxIndex : current - 1)
+  const next = () => goTo(current >= maxIndex ? 0 : current + 1)
+
+  return (
+    <Box>
+      {/* Barre de contrôles */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2.5, px: 0.5 }}>
+
+        {/* Compteur */}
+        <Typography sx={{ fontSize: 13, color: '#6b7c70', fontWeight: 500 }}>
+          <Box component="span" sx={{ fontWeight: 800, color: GREEN, fontSize: 15 }}>
+            {current + 1}
+          </Box>
+          {' / '}{sorted.length}
+        </Typography>
+
+        {/* Boutons */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {/* Play / Pause */}
+          <IconButton
+            className="nav-btn"
+            onClick={() => setPlaying(p => !p)}
+            size="small"
+            title={playing ? 'Pause' : 'Lecture'}
+            sx={{
+              width: 36, height: 36,
+              border: '1.5px solid rgba(27,122,62,0.2)',
+              color: GREEN, background: '#fff',
+              '&:hover': { background: '#f0f7f2' },
+            }}
+          >
+            {playing ? <Pause size={14} /> : <Play size={14} />}
+          </IconButton>
+
+          {/* Précédent */}
+          <IconButton
+            className="nav-btn"
+            onClick={prev}
+            disabled={sorted.length <= visible}
+            size="small"
+            sx={{
+              width: 40, height: 40,
+              border: '1.5px solid rgba(27,122,62,0.22)',
+              color: GREEN, background: '#fff',
+              '&:hover': { background: '#f0f7f2', borderColor: GREEN },
+              '&.Mui-disabled': { opacity: 0.3 },
+            }}
+          >
+            <ChevronLeft size={20} />
+          </IconButton>
+
+          {/* Suivant */}
+          <IconButton
+            className="nav-btn"
+            onClick={next}
+            disabled={sorted.length <= visible}
+            size="small"
+            sx={{
+              width: 40, height: 40,
+              border: `1.5px solid ${GREEN}`,
+              color: '#fff', background: GREEN,
+              '&:hover': { background: '#0f4a25', borderColor: '#0f4a25' },
+              '&.Mui-disabled': { opacity: 0.3 },
+            }}
+          >
+            <ChevronRight size={20} />
+          </IconButton>
+        </Box>
       </Box>
+
+      {/* Piste carrousel */}
+      <Box
+        ref={containerRef}
+        sx={{ overflow: 'hidden', borderRadius: '16px', pb: 1 }}
+      >
+        <div
+          className="act-track"
+          style={{ transform: `translateX(${-(current * cardW)}px)` }}
+        >
+          {sorted.map((act) => (
+            <ActCard key={act.id} act={act} cardWidth={cardW} />
+          ))}
+        </div>
+      </Box>
+
+      {/* Dots de navigation */}
+      {maxIndex > 0 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', gap: 0.75, mt: 2.5 }}>
+          {Array.from({ length: maxIndex + 1 }).map((_, i) => (
+            <Box
+              key={i}
+              className="carousel-dot"
+              onClick={() => goTo(i)}
+              sx={{
+                height: 8,
+                width: i === current ? 24 : 8,
+                borderRadius: '8px',
+                background: i === current ? ORANGE : 'rgba(27,122,62,0.2)',
+              }}
+            />
+          ))}
+        </Box>
+      )}
     </Box>
   )
 }
 
-function FeaturedActCard({ act, index }) {
-  return <ActCard act={act} index={index} variant="featured" />
-}
-
+/* ─── Page principale ─── */
 export default function Activites() {
   const { data, isLoading } = useQuery({
     queryKey: ['activites-public'],
     queryFn:  () => activitesApi.getAll(),
   })
 
-  const activites = data?.data?.data?.data || []
+  const activites      = data?.data?.data?.data || []
   const totalActivites = activites.length
-
-  // Compter les activités à venir
-  const activitesAVenir = activites.filter(act => 
-    act.date_activite && new Date(act.date_activite) > new Date()
-  ).length
 
   return (
     <Box>
@@ -402,172 +412,72 @@ export default function Activites() {
 
       {/* ══════════ HERO ══════════ */}
       <Box sx={{
-        background: 'linear-gradient(135deg, #0a2e18 0%, #0f4a25 50%, #1a5e32 100%)',
-        pt: { xs: 10, md: 14 },
-        pb: { xs: 8, md: 12 },
-        position: 'relative',
-        overflow: 'hidden',
+        background: 'linear-gradient(135deg, #0f4a25, #1B7A3E)',
+        py: { xs: 8, md: 11 },
+        px: 3,
+        textAlign: 'center',
       }}>
-        {/* Grille de fond */}
-        <Box sx={{
-          position: 'absolute', inset: 0,
-          backgroundImage: 'linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)',
-          backgroundSize: '48px 48px', pointerEvents: 'none',
-        }} />
-        {/* Halos décoratifs */}
-        <Box sx={{ position: 'absolute', width: 700, height: 700, right: -250, top: -250, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,127,39,0.09) 0%, transparent 65%)', pointerEvents: 'none' }} />
-        <Box sx={{ position: 'absolute', width: 400, height: 400, left: -100, bottom: -100, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,195,74,0.06) 0%, transparent 65%)', pointerEvents: 'none' }} />
+        <Container maxWidth="md">
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+            <Box sx={{
+              width: 56, height: 56,
+              background: ORANGE, borderRadius: '14px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <CalendarDays size={26} color="#0f4a25" />
+            </Box>
+          </Box>
 
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={7}>
-              <Box sx={{ animation: 'slideInRight 0.8s ease' }}>
-                {/* Badge */}
-                <Box sx={{
-                  display: 'inline-flex', alignItems: 'center', gap: 1.25,
-                  px: 2, py: 0.65, borderRadius: '30px',
-                  background: 'rgba(255,127,39,0.12)', border: '1px solid rgba(255,127,39,0.28)',
-                  mb: 2.5,
-                }}>
-                  <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: ORANGE, animation: 'pulse-dot 2.2s ease infinite' }} />
-                  <Typography sx={{ fontSize: 10.5, fontWeight: 800, color: ORANGE, letterSpacing: '2.5px', textTransform: 'uppercase' }}>
-                    VIE SCOLAIRE
-                  </Typography>
-                </Box>
-                
-                <Typography
-                  variant="h1"
-                  sx={{
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: { xs: 48, md: 72 },
-                    fontWeight: 700,
-                    lineHeight: 1,
-                    color: '#fff',
-                    mb: 2,
-                  }}
-                >
-                  Activités et
-                  <Box component="span" sx={{ color: ORANGE, display: 'block', fontStyle: 'italic' }}>
-                    événements
-                  </Box>
-                </Typography>
+          <Typography variant="h1" sx={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: { xs: 36, md: 54 }, fontWeight: 700,
+            color: '#fff', lineHeight: 1.1, mb: 1.5,
+          }}>
+            Activités et événements
+          </Typography>
 
-                <Typography sx={{
-                  color: 'rgba(255,255,255,0.7)',
-                  fontSize: { xs: 14, md: 16 },
-                  lineHeight: 1.8,
-                  maxWidth: 520,
-                  mb: 3,
-                }}>
-                  Découvrez toutes les activités organisées par l'école : sorties scolaires, ateliers spéciaux, célébrations et événements pédagogiques.
-                </Typography>
+          <Typography sx={{
+            color: 'rgba(255,255,255,0.65)', fontSize: 14.5,
+            maxWidth: 560, mx: 'auto', lineHeight: 1.8, mb: 2.5,
+          }}>
+            Découvrez toutes les activités organisées par l'école : sorties scolaires, ateliers spéciaux, célébrations et événements pédagogiques.
+          </Typography>
 
-                {/* Stats réelles */}
-                <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-                  <Box>
-                    <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 36, fontWeight: 700, color: ORANGE, lineHeight: 1 }}>
-                      {totalActivites}
-                    </Typography>
-                    <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                      Activités
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 36, fontWeight: 700, color: ORANGE, lineHeight: 1 }}>
-                      {activitesAVenir}
-                    </Typography>
-                    <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                      À venir
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 36, fontWeight: 700, color: ORANGE, lineHeight: 1 }}>
-                      24/7
-                    </Typography>
-                    <Typography sx={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }}>
-                      Bienveillance
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-            </Grid>
-
-            <Grid item xs={12} md={5}>
-              {/* Badge circulaire décoratif */}
-              <Box sx={{
-                position: 'relative',
-                width: 280,
-                height: 280,
-                margin: '0 auto',
-              }}>
-                <Box sx={{
-                  position: 'absolute',
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '50%',
-                  background: `radial-gradient(circle, ${ORANGE}20 0%, transparent 70%)`,
-                  animation: 'pulse-glow 3s infinite',
-                }} />
-                <Box sx={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: 200,
-                  height: 200,
-                  borderRadius: '50%',
-                  background: '#fff',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 30px 60px rgba(0,0,0,0.3)',
-                }}>
-                  <BookOpen size={48} color={ORANGE} />
-                  <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 24, fontWeight: 700, color: '#0c1a10', mt: 1 }}>
-                    Apprendre
-                  </Typography>
-                  <Typography sx={{ fontSize: 12, color: '#6b7c70' }}>
-                    en s'amusant
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
-          </Grid>
+          {totalActivites > 0 && (
+            <Box sx={{
+              display: 'inline-flex', alignItems: 'center', gap: 1,
+              px: 2, py: 0.65, borderRadius: '30px',
+              background: 'rgba(255,127,39,0.12)',
+              border: '1px solid rgba(255,127,39,0.28)',
+            }}>
+              <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: ORANGE, animation: 'pulse-dot 2.2s ease infinite' }} />
+              <Typography sx={{ fontSize: 12, fontWeight: 700, color: ORANGE, letterSpacing: '1px' }}>
+                {totalActivites} activité{totalActivites > 1 ? 's' : ''} au programme
+              </Typography>
+            </Box>
+          )}
         </Container>
       </Box>
 
-      {/* ══════════ GRILLE D'ACTIVITÉS ══════════ */}
-      <Box sx={{ py: 8, background: '#f8faf9' }}>
+      {/* ══════════ CARROUSEL ══════════ */}
+      <Box sx={{ py: 7, background: '#f8faf9' }}>
         <Container maxWidth="lg">
-          {/* En-tête de section */}
-          <Box sx={{ mb: 5, textAlign: 'center' }}>
+
+          {/* En-tête */}
+          <Box sx={{ mb: 4, textAlign: 'center' }}>
             <Chip
               label="PROGRAMME SCOLAIRE"
-              sx={{
-                bgcolor: 'rgba(255,127,39,0.1)',
-                color: ORANGE,
-                fontWeight: 700,
-                fontSize: 11,
-                letterSpacing: '1.5px',
-                mb: 1.5,
-              }}
+              sx={{ bgcolor: 'rgba(255,127,39,0.1)', color: ORANGE, fontWeight: 700, fontSize: 11, letterSpacing: '1.5px', mb: 1.5 }}
             />
-            <Typography
-              variant="h2"
-              sx={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: { xs: 32, md: 42 },
-                fontWeight: 700,
-                color: '#0c1a10',
-                mb: 1,
-              }}
-            >
+            <Typography variant="h2" sx={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: { xs: 28, md: 38 }, fontWeight: 700, color: '#0c1a10', mb: 0.75,
+            }}>
               Nos <Box component="span" sx={{ color: ORANGE }}>activités</Box>
             </Typography>
-            <Typography sx={{ color: '#6b7c70', fontSize: 15, maxWidth: 560, mx: 'auto' }}>
-              {totalActivites > 0 
-                ? `Découvrez les ${totalActivites} activités organisées par l'école` 
+            <Typography sx={{ color: '#6b7c70', fontSize: 14, maxWidth: 500, mx: 'auto' }}>
+              {totalActivites > 0
+                ? `${totalActivites} activité${totalActivites > 1 ? 's' : ''} — des plus récentes aux plus anciennes`
                 : 'Aucune activité pour le moment'}
             </Typography>
           </Box>
@@ -579,48 +489,27 @@ export default function Activites() {
             </Box>
           ) : activites.length === 0 ? (
             <Box sx={{
-              textAlign: 'center',
-              py: 10,
-              background: '#fff',
-              borderRadius: '32px',
+              textAlign: 'center', py: 10,
+              background: '#fff', borderRadius: '28px',
               border: '1px dashed rgba(27,122,62,0.2)',
             }}>
               <Box sx={{
-                width: 80,
-                height: 80,
-                borderRadius: '30px',
+                width: 72, height: 72, borderRadius: '28px',
                 background: '#eaf4ee',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                mx: 'auto',
-                mb: 3,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                mx: 'auto', mb: 2.5,
               }}>
-                <Sparkles size={40} color="#1B7A3E" style={{ opacity: 0.5 }} />
+                <Sparkles size={36} color={GREEN} style={{ opacity: 0.5 }} />
               </Box>
-              <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 28, fontWeight: 700, color: '#0c1a10', mb: 1 }}>
+              <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 700, color: '#0c1a10', mb: 1 }}>
                 Aucune activité pour le moment
               </Typography>
-              <Typography sx={{ color: '#6b7c70', fontSize: 15 }}>
+              <Typography sx={{ color: '#6b7c70', fontSize: 14 }}>
                 Les prochaines activités seront bientôt annoncées
               </Typography>
             </Box>
           ) : (
-            <Grid container spacing={3}>
-              {/* Première activité en vedette */}
-              {activites[0] && (
-                <Grid item xs={12}>
-                  <FeaturedActCard act={activites[0]} index={0} />
-                </Grid>
-              )}
-              
-              {/* Activités suivantes en grille 2 colonnes */}
-              {activites.slice(1).map((act, idx) => (
-                <Grid item xs={12} md={6} key={act.id}>
-                  <ActCard act={act} index={idx + 1} />
-                </Grid>
-              ))}
-            </Grid>
+            <Carousel activites={activites} />
           )}
         </Container>
       </Box>
