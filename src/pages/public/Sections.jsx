@@ -1,6 +1,5 @@
 import { useState } from 'react'
-import { Box, Container, Grid, Typography, Chip, Button } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { Box, Container, Grid, Typography, Chip } from '@mui/material'
 import { Baby, Smile, BookOpen, GraduationCap, Clock, Users, Star, Package, ChevronRight } from 'lucide-react'
 
 // COULEUR ORANGE DU MINISTÈRE
@@ -387,34 +386,6 @@ function SectionPage({ config }) {
                   </Typography>
                 </Box>
 
-                {/* CTA */}
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography sx={{ fontSize: 15, color: '#6b7c70', mb: 2 }}>
-                    Inscriptions ouvertes · dès le 1er Sept. 2025
-                  </Typography>
-                  <Button
-                    component={Link}
-                    to="/inscription"
-                    variant="contained"
-                    fullWidth
-                    sx={{
-                      background: `linear-gradient(135deg, ${config.darkColor}, ${config.color})`,
-                      py: 1.7,
-                      borderRadius: '13px',
-                      fontWeight: 800,
-                      fontSize: 17,
-                      letterSpacing: '0.3px',
-                      '&:hover': {
-                        background: `linear-gradient(135deg, ${config.color}, ${config.darkColor})`,
-                        transform: 'translateY(-2px)',
-                        boxShadow: `0 12px 32px ${config.color}45`,
-                      },
-                      transition: 'all 0.25s',
-                    }}
-                  >
-                    Inscrire mon enfant
-                  </Button>
-                </Box>
 
               </Box>
             </Grid>
