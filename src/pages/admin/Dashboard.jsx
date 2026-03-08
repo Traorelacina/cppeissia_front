@@ -115,8 +115,6 @@ function AlertesBanner({ stats }) {
   const alertes = []
   if (stats.messages_non_lus > 0)
     alertes.push({ icon: Mail, color: '#dc2626', bg: '#fce4ec', msg: `${stats.messages_non_lus} message${stats.messages_non_lus > 1 ? 's' : ''} non lu${stats.messages_non_lus > 1 ? 's' : ''}`, to: '/admin/messages' })
-  if (stats.inscriptions_en_attente > 0)
-    alertes.push({ icon: Clock, color: '#b87b0f', bg: '#fff3e0', msg: `${stats.inscriptions_en_attente} inscription${stats.inscriptions_en_attente > 1 ? 's' : ''} en attente`, to: '/admin/inscriptions' })
   if (stats.actualites_brouillons > 0)
     alertes.push({ icon: Newspaper, color: '#1565c0', bg: '#dbeafe', msg: `${stats.actualites_brouillons} brouillon${stats.actualites_brouillons > 1 ? 's' : ''}`, to: '/admin/actualites' })
   if (alertes.length === 0) return null
@@ -139,11 +137,21 @@ function AlertesBanner({ stats }) {
 const QUICK_LINKS = [
   { label: 'Nouvelle actualité',    icon: Plus,          to: '/admin/actualites/nouvelle', color: '#1B7A3E', bg: '#eaf4ee' },
   { label: 'Nouvelle activité',     icon: Sparkles,      to: '/admin/activites/nouvelle',  color: '#6b21a8', bg: '#f3e8ff' },
-  { label: 'Gérer la galerie',      icon: Image,         to: '/admin/galerie',             color: '#1565c0', bg: '#dbeafe' },
-  { label: 'Voir les inscriptions', icon: ClipboardList, to: '/admin/inscriptions',        color: '#b87b0f', bg: '#fff3e0' },
+  { label: 'Messages',              icon: MessageSquare, to: '/admin/messages',            color: '#1565c0', bg: '#dbeafe' },
   { label: 'Calendrier',            icon: CalendarDays,  to: '/admin/calendrier',          color: '#0f766e', bg: '#ccfbf1' },
   { label: 'Paramètres',            icon: BookOpen,      to: '/admin/parametres',          color: '#64748b', bg: '#f1f5f9' },
 ]
+
+// ─────────────────────────────────────────────────────────────
+// Fonction pour extraire un aperçu du contenu
+// ─────────────────────────────────────────────────────────────
+function getContentPreview(content, maxLength = 40) {
+  if (!content) return 'Sans contenu'
+  const plainText = content.replace(/[*_~`#]/g, '')
+  return plainText.length > maxLength 
+    ? plainText.substring(0, maxLength) + '…' 
+    : plainText
+}
 
 // ─────────────────────────────────────────────────────────────
 // DASHBOARD PRINCIPAL
@@ -166,7 +174,6 @@ export default function Dashboard() {
   }
 
   const stats               = data?.data?.data?.stats                || {}
-  const dernieres_inscriptions = data?.data?.data?.dernieres_inscriptions || []
   const derniers_messages      = data?.data?.data?.derniers_messages      || []
   const dernieres_actualites   = data?.data?.data?.dernieres_actualites   || []
   const dernieres_activites    = data?.data?.data?.dernieres_activites    || []
@@ -175,7 +182,6 @@ export default function Dashboard() {
   const hour      = new Date().getHours()
   const greet     = hour < 12 ? 'Bonjour' : hour < 18 ? 'Bon après-midi' : 'Bonsoir'
   const firstName = user?.name?.split(' ')[0] || 'Directeur'
-  const totalInsc = stats.inscriptions_total || 1
 
   return (
     <Box>
@@ -220,20 +226,9 @@ export default function Dashboard() {
       <Grid container spacing={2} sx={{ mb: 3 }}>
         {[
           {
-            icon: ClipboardList, label: 'Total inscriptions', value: stats.inscriptions_total,
-            delta: stats.inscriptions_ce_mois ? `+${stats.inscriptions_ce_mois} ce mois` : undefined,
-            deltaType: 'up', color: '#1B7A3E',
-            sub: stats.inscriptions_en_attente ? `${stats.inscriptions_en_attente} en attente` : undefined,
-            to: '/admin/inscriptions',
-          },
-          {
             icon: Newspaper, label: 'Actualités publiées', value: stats.actualites_publiees,
             delta: stats.actualites_brouillons ? `${stats.actualites_brouillons} brouillons` : undefined,
             deltaType: 'warn', color: '#1565c0', to: '/admin/actualites',
-          },
-          {
-            icon: Image, label: 'Photos en galerie', value: stats.photos_galerie,
-            color: '#0f766e', to: '/admin/galerie',
           },
           {
             icon: MessageSquare, label: 'Messages non lus', value: stats.messages_non_lus,
@@ -242,8 +237,12 @@ export default function Dashboard() {
             color: stats.messages_non_lus > 0 ? '#dc2626' : '#15803d',
             to: '/admin/messages',
           },
+          {
+            icon: Sparkles, label: 'Activités', value: stats.activites_total || 0,
+            color: '#6b21a8', to: '/admin/activites',
+          },
         ].map((props) => (
-          <Grid item xs={6} sm={3} key={props.label}>
+          <Grid item xs={12} sm={4} key={props.label}>
             <KpiCard loading={isLoading} {...props} />
           </Grid>
         ))}
@@ -262,11 +261,10 @@ export default function Dashboard() {
         </Box>
       </Paper>
 
-      {/* ─── LIGNE 1 : ACTUALITÉS + INSCRIPTIONS ─── */}
+      {/* ─── LIGNE 1 : ACTUALITÉS ─── */}
       <Grid container spacing={2.5} sx={{ mb: 2.5 }}>
-        {/* ACTUALITÉS */}
-        <Grid item xs={12} lg={7}>
-          <Paper sx={{ overflow: 'hidden', borderRadius: '16px', height: '100%' }}>
+        <Grid item xs={12}>
+          <Paper sx={{ overflow: 'hidden', borderRadius: '16px' }}>
             <BlockHeader title="Flash infos récents" icon={Newspaper} to="/admin/actualites"
               action={
                 <Tooltip title="Créer une actualité">
@@ -289,7 +287,7 @@ export default function Dashboard() {
               <Table size="small">
                 <TableHead>
                   <TableRow sx={{ background: '#f9fbf9' }}>
-                    {['Titre', 'Type', 'Date', 'Statut', ''].map((h, i) => (
+                    {['Contenu', 'Type', 'Date', 'Statut', ''].map((h, i) => (
                       <TableCell key={i} align={i === 4 ? 'right' : 'left'} sx={{ fontSize: 10.5, fontWeight: 700, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', display: [2].includes(i) ? { xs: 'none', sm: 'table-cell' } : [1].includes(i) ? { xs: 'none', md: 'table-cell' } : 'table-cell' }}>{h}</TableCell>
                     ))}
                   </TableRow>
@@ -298,7 +296,9 @@ export default function Dashboard() {
                   {dernieres_actualites.map((actu) => (
                     <TableRow key={actu.id} hover sx={{ '&:last-child td': { borderBottom: 0 } }}>
                       <TableCell>
-                        <Typography sx={{ fontWeight: 600, fontSize: 13, color: '#0c1a10', maxWidth: { xs: 140, md: 220 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{actu.titre}</Typography>
+                        <Typography sx={{ fontWeight: 600, fontSize: 13, color: '#0c1a10', maxWidth: { xs: 200, md: 400 }, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {getContentPreview(actu.contenu)}
+                        </Typography>
                         <Typography sx={{ fontSize: 11, color: '#9ca3af', mt: 0.2 }}>{actu.auteur?.name || 'Direction'}</Typography>
                       </TableCell>
                       <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>
@@ -322,56 +322,12 @@ export default function Dashboard() {
             )}
           </Paper>
         </Grid>
-
-        {/* INSCRIPTIONS */}
-        <Grid item xs={12} lg={5}>
-          <Paper sx={{ overflow: 'hidden', borderRadius: '16px', height: '100%' }}>
-            <BlockHeader title="Dernières inscriptions" icon={ClipboardList} to="/admin/inscriptions" />
-
-            {isLoading ? (
-              <Box sx={{ p: 2.5 }}>{[...Array(5)].map((_, i) => <Skeleton key={i} height={52} sx={{ mb: 0.75, borderRadius: '8px' }} />)}</Box>
-            ) : dernieres_inscriptions.length === 0 ? (
-              <Box sx={{ p: 5, textAlign: 'center' }}>
-                <ClipboardList size={32} color="#dae8df" style={{ margin: '0 auto 12px' }} />
-                <Typography sx={{ color: '#6b7c70', fontSize: 13.5 }}>Aucune inscription reçue.</Typography>
-              </Box>
-            ) : (
-              <Box>
-                {dernieres_inscriptions.map((insc, i) => {
-                  const sm = SECTION_META[insc.section] || {}
-                  const st = STATUT_INSC[insc.statut]  || {}
-                  return (
-                    <Box key={insc.id}>
-                      {i > 0 && <Divider sx={{ mx: 2.5 }} />}
-                      <Box component={Link} to={`/admin/inscriptions/${insc.id}`} sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2.5, py: 1.75, textDecoration: 'none', transition: 'background 0.15s', '&:hover': { background: '#f9fbf9' } }}>
-                        <Avatar sx={{ width: 34, height: 34, background: sm.bg || '#eaf4ee', color: sm.color || '#1B7A3E', fontSize: 13, fontWeight: 800 }}>
-                          {insc.nom_enfant?.[0]?.toUpperCase()}
-                        </Avatar>
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography sx={{ fontWeight: 700, fontSize: 13, color: '#0c1a10', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {insc.nom_enfant} {insc.prenoms_enfant}
-                          </Typography>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
-                            {sm.label && <Typography sx={{ fontSize: 11, color: sm.color, fontWeight: 600 }}>{sm.label}</Typography>}
-                            <Typography sx={{ fontSize: 10, color: '#c4cfca' }}>·</Typography>
-                            <Typography sx={{ fontSize: 11, color: '#9ca3af' }}>{timeAgo(insc.created_at)}</Typography>
-                          </Box>
-                        </Box>
-                        <Chip label={st.label || insc.statut} size="small" sx={{ background: st.bg, color: st.color, fontWeight: 700, fontSize: 10, height: 20 }} />
-                      </Box>
-                    </Box>
-                  )
-                })}
-              </Box>
-            )}
-          </Paper>
-        </Grid>
       </Grid>
 
-      {/* ─── LIGNE 2 : MESSAGES + SECTIONS + ACTIVITÉS ─── */}
+      {/* ─── LIGNE 2 : MESSAGES + ACTIVITÉS ─── */}
       <Grid container spacing={2.5}>
         {/* MESSAGES */}
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={6}>
           <Paper sx={{ overflow: 'hidden', borderRadius: '16px', height: '100%' }}>
             <BlockHeader title="Messages de contact" icon={Mail} to="/admin/messages" />
 
@@ -404,54 +360,8 @@ export default function Dashboard() {
           </Paper>
         </Grid>
 
-        {/* RÉPARTITION PAR SECTION */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ overflow: 'hidden', borderRadius: '16px', height: '100%' }}>
-            <BlockHeader title="Inscriptions par section" icon={Users} to="/admin/inscriptions" />
-            <Box sx={{ p: 3 }}>
-              {isLoading ? (
-                [...Array(4)].map((_, i) => <Skeleton key={i} height={44} sx={{ mb: 1.5, borderRadius: '8px' }} />)
-              ) : !stats.inscriptions_par_section ? (
-                <Box sx={{ textAlign: 'center', py: 3 }}>
-                  <Users size={32} color="#dae8df" style={{ margin: '0 auto 10px' }} />
-                  <Typography sx={{ color: '#6b7c70', fontSize: 13 }}>Aucune donnée disponible.</Typography>
-                </Box>
-              ) : (
-                <>
-                  {Object.entries(SECTION_META).map(([key, { label, barColor, bg, color }]) => {
-                    const count = stats.inscriptions_par_section[key] || 0
-                    const pct   = Math.round((count / totalInsc) * 100)
-                    return (
-                      <Box key={key} sx={{ mb: 2.5 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.75 }}>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', background: barColor }} />
-                            <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: '#2d3a30' }}>{label}</Typography>
-                          </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Typography sx={{ fontSize: 12.5, fontWeight: 700, color }}>{count}</Typography>
-                            <Chip label={`${pct}%`} size="small" sx={{ background: bg, color, fontWeight: 700, fontSize: 10, height: 18 }} />
-                          </Box>
-                        </Box>
-                        <LinearProgress variant="determinate" value={pct} sx={{ height: 6, borderRadius: 3, background: '#f0f4f0', '& .MuiLinearProgress-bar': { background: barColor, borderRadius: 3 } }} />
-                      </Box>
-                    )
-                  })}
-                  <Divider sx={{ my: 2 }} />
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography sx={{ fontSize: 12, color: '#6b7c70' }}>Total</Typography>
-                    <Typography sx={{ fontSize: 16, fontWeight: 800, color: '#0c1a10', fontFamily: "'Cormorant Garamond', serif" }}>
-                      {stats.inscriptions_total || 0} élèves
-                    </Typography>
-                  </Box>
-                </>
-              )}
-            </Box>
-          </Paper>
-        </Grid>
-
         {/* ACTIVITÉS RÉCENTES */}
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={6}>
           <Paper sx={{ overflow: 'hidden', borderRadius: '16px', height: '100%' }}>
             <BlockHeader title="Activités récentes" icon={Sparkles} to="/admin/activites"
               action={
