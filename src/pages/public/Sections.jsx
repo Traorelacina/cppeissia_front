@@ -1,13 +1,13 @@
+import { useState } from 'react'
 import { Box, Container, Grid, Typography, Chip, Button } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { Baby, Smile, BookOpen, GraduationCap, Clock, Users, Star, Package, ChevronRight } from 'lucide-react'
-import { useState } from 'react'
 
 // COULEUR ORANGE DU MINISTÈRE
 const ORANGE = '#FF7F27'
 
 // ─────────────────────────────────────────────────────────────
-// Données officielles issues du document CPPE Issia 2025-2026
+// Données officielles CPPE Issia 2025-2026
 // ─────────────────────────────────────────────────────────────
 const SECTIONS_CONFIG = [
   {
@@ -17,18 +17,17 @@ const SECTIONS_CONFIG = [
     sublabel: 'Section Spéciale',
     tranche: '1 an 6 mois — 2 ans 11 mois',
     icon: Baby,
+    // ✅ Vert aligné sur Contact : GREEN_MAIN '#1B7A3E' / GREEN_DARK '#0f4a25'
     color: '#1B7A3E',
-    darkColor: '#0a2e18',
+    darkColor: '#0f4a25',
     accent: '#eaf4ee',
     accentBorder: '#b2dfca',
-    places: '25',
+    effectif: 'Maximum 25 enfants',
+    encadrement: '1 éducatrice pour 6 enfants',
     description: 'La crèche accueille les tout-petits dans un environnement doux, sécurisant et stimulant. Chaque enfant est accompagné individuellement dans ses premières découvertes du monde.',
     objectifs: 'Éveil sensoriel, développement de la motricité et construction de la confiance en soi. Nos éducatrices spécialisées assurent un suivi personnalisé de chaque enfant dans un cadre bienveillant.',
     activites: ['Éveil sensoriel', 'Jeux libres', 'Musique & rythme', 'Motricité globale', 'Modelage', 'Histoires illustrées'],
     fournitures: ['01 Paquet de rame', '01 Paquet de papier hygiénique (Lotus ou Lisse)', '01 Paquet de savon Omo (500 g)', '01 Pot de javel (1 L)'],
-    effectif: 'Maximum 25 enfants',
-    encadrement: '1 éducatrice pour 6 enfants',
-    stats: [{ label: "Tranche d'âge", value: '1½-3' }, { label: 'Encadrantes', value: '4' }, { label: 'Places', value: '25' }, { label: 'Ratio', value: '1/6' }],
   },
   {
     id: 'petite_section',
@@ -41,14 +40,12 @@ const SECTIONS_CONFIG = [
     darkColor: '#cc6400',
     accent: '#fff8e1',
     accentBorder: '#ffe082',
-    places: '40',
+    effectif: 'Maximum 20 enfants par classe',
+    encadrement: '1 enseignant + 1 aide maternelle',
     description: "La Petite Section accompagne l'enfant dans sa première grande aventure scolaire. L'enfant développe son langage, sa socialisation et sa créativité.",
     objectifs: "La Petite Section vise l'épanouissement affectif, l'acquisition du langage oral et l'initiation aux activités graphiques et artistiques.",
     activites: ['Langage oral', 'Dessin & peinture', 'Puzzles', 'Chansons & comptines', 'Jeux de construction', 'Éveil à la nature'],
     fournitures: ['01 Paquet de rame', '01 Paquet de papier hygiénique (Lotus ou Lisse)', '01 Paquet de savon Omo (500 g)', '01 Pot de javel (1 L)'],
-    effectif: 'Maximum 20 enfants par classe',
-    encadrement: '1 enseignant + 1 aide maternelle',
-    stats: [{ label: "Tranche d'âge", value: '3-4' }, { label: 'Classes', value: '2' }, { label: 'Places', value: '40' }, { label: 'Ratio', value: '1/20' }],
   },
   {
     id: 'moyenne_section',
@@ -61,14 +58,12 @@ const SECTIONS_CONFIG = [
     darkColor: '#0d47a1',
     accent: '#e3f2fd',
     accentBorder: '#90caf9',
-    places: '50',
+    effectif: 'Maximum 25 enfants par classe',
+    encadrement: '1 enseignant + 1 aide maternelle',
     description: "La Moyenne Section est une année charnière : l'enfant gagne en autonomie, enrichit son vocabulaire et s'initie aux premières notions de logique et de numération.",
     objectifs: "Développement de la motricité fine, du sens de l'observation et de la capacité à travailler en groupe. Accent sur la découverte de l'environnement.",
     activites: ['Pré-écriture', 'Numération (1-10)', 'Découverte du monde', 'Jeux de rôle', 'Poésie', 'Travaux manuels'],
     fournitures: ['01 Paquet de rame', '01 Paquet de papier hygiénique (Lotus ou Lisse)', '01 Paquet de savon Omo (500 g)', '01 Pot de javel (1 L)'],
-    effectif: 'Maximum 25 enfants par classe',
-    encadrement: '1 enseignant + 1 aide maternelle',
-    stats: [{ label: "Tranche d'âge", value: '4-5' }, { label: 'Classes', value: '2' }, { label: 'Places', value: '50' }, { label: 'Ratio', value: '1/25' }],
   },
   {
     id: 'grande_section',
@@ -81,19 +76,17 @@ const SECTIONS_CONFIG = [
     darkColor: '#8b0000',
     accent: '#ffebee',
     accentBorder: '#ef9a9a',
-    places: '50',
-    description: "La Grande Section prépare les enfants à l'entrée au cours préparatoire. C'est l'aboutissement du parcours maternelle, riche en apprentissages fondamentaux.",
-    objectifs: "Consolidation des acquisitions linguistiques, initiation à la lecture et l'écriture, développement logico-mathématique et renforcement de l'autonomie pour aborder le CP.",
-    activites: ['Initiation à l\'écriture', 'Lecture (méthode syllabique)', 'Calcul mental', 'Géographie locale', 'Théâtre & expression', 'Éducation physique'],
-    fournitures: ['01 Paquet de feutre gros bout (Reynold ou Bic)', '01 Paquet de papier hygiénique (Lotus ou Lisse)', '01 Sachet de savon Omo (500 g)'],
     effectif: 'Maximum 25 enfants par classe',
     encadrement: '1 enseignant + 1 aide maternelle',
-    stats: [{ label: "Tranche d'âge", value: '5-6' }, { label: 'Classes', value: '2' }, { label: 'Places', value: '50' }, { label: 'Ratio', value: '1/25' }],
+    description: "La Grande Section prépare les enfants à l'entrée au cours préparatoire. C'est l'aboutissement du parcours maternelle, riche en apprentissages fondamentaux.",
+    objectifs: "Consolidation des acquisitions linguistiques, initiation à la lecture et l'écriture, développement logico-mathématique et renforcement de l'autonomie pour aborder le CP.",
+    activites: ["Initiation à l'écriture", 'Lecture (méthode syllabique)', 'Calcul mental', 'Géographie locale', 'Théâtre & expression', 'Éducation physique'],
+    fournitures: ['01 Paquet de feutre gros bout (Reynold ou Bic)', '01 Paquet de papier hygiénique (Lotus ou Lisse)', '01 Sachet de savon Omo (500 g)'],
   },
 ]
 
 // ─────────────────────────────────────────────────────────────
-// Composant page Section individuelle (interne)
+// Composant page Section individuelle
 // ─────────────────────────────────────────────────────────────
 function SectionPage({ config }) {
   const [showFournitures, setShowFournitures] = useState(true)
@@ -101,103 +94,227 @@ function SectionPage({ config }) {
 
   return (
     <Box>
-      {/* ── HERO ── */}
+      {/* ══════════ HERO ══════════ */}
       <Box sx={{
         background: `linear-gradient(135deg, ${config.darkColor}, ${config.color})`,
-        py: { xs: 8, md: 12 }, px: 3,
-        position: 'relative', overflow: 'hidden',
+        py: { xs: 9, md: 13 },
+        px: 3,
+        position: 'relative',
+        overflow: 'hidden',
       }}>
-        <Box sx={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px)', backgroundSize: '40px 40px', pointerEvents: 'none' }} />
+        {/* Grille de fond subtile */}
+        <Box sx={{
+          position: 'absolute', inset: 0,
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px)',
+          backgroundSize: '48px 48px',
+          pointerEvents: 'none',
+        }} />
 
-        <Container maxWidth="lg">
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={8}>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2.5 }}>
-                <Box sx={{ width: 58, height: 58, background: 'rgba(255,255,255,0.18)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(4px)' }}>
-                  <Icon size={28} color="#fff" />
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+          <Grid container spacing={5} alignItems="center">
+
+            {/* ── GAUCHE — Titre & description ── */}
+            <Grid item xs={12} md={7}>
+              {/* Icône + badge tranche d'âge */}
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, mb: 3.5, flexWrap: 'wrap' }}>
+                <Box sx={{
+                  width: 68, height: 68,
+                  background: 'rgba(255,255,255,0.18)',
+                  borderRadius: '18px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  backdropFilter: 'blur(4px)',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  flexShrink: 0,
+                }}>
+                  <Icon size={34} color="#fff" />
                 </Box>
-                <Chip
-                  label={config.tranche}
-                  size="small"
-                  sx={{ background: 'rgba(255,255,255,0.2)', color: '#fff', fontWeight: 700, fontSize: 11, border: '1px solid rgba(255,255,255,0.35)' }}
-                />
+                <Box sx={{
+                  px: 2.5, py: 1.25,
+                  background: 'rgba(255,255,255,0.16)',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  borderRadius: '30px',
+                  backdropFilter: 'blur(4px)',
+                }}>
+                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', letterSpacing: '1.5px', mb: 0.3 }}>
+                    Tranche d'âge
+                  </Typography>
+                  <Typography sx={{ fontSize: 17, fontWeight: 800, color: '#fff', lineHeight: 1.1 }}>
+                    {config.tranche}
+                  </Typography>
+                </Box>
               </Box>
 
-              <Typography variant="h1" sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 36, md: 58 }, fontWeight: 700, color: '#fff', lineHeight: 1.05, mb: 1.5 }}>
+              {/* Titre principal */}
+              <Typography variant="h1" sx={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: { xs: 46, md: 70 },
+                fontWeight: 700,
+                color: '#fff',
+                lineHeight: 1.0,
+                mb: 2.25,
+              }}>
                 {config.titre}
-                <Box component="span" sx={{ display: 'block', fontSize: { xs: 20, md: 28 }, color: 'rgba(255,255,255,0.5)', fontStyle: 'italic', fontWeight: 400, mt: 0.5 }}>
+                <Box component="span" sx={{
+                  display: 'block',
+                  fontSize: { xs: 26, md: 36 },
+                  color: 'rgba(255,255,255,0.45)',
+                  fontStyle: 'italic',
+                  fontWeight: 400,
+                  mt: 0.75,
+                }}>
                   {config.sublabel}
                 </Box>
               </Typography>
 
-              <Typography sx={{ color: 'rgba(255,255,255,0.72)', fontSize: 14.5, lineHeight: 1.85, maxWidth: 520, borderLeft: '3px solid rgba(255,255,255,0.3)', pl: 2 }}>
+              {/* Description */}
+              <Typography sx={{
+                color: 'rgba(255,255,255,0.78)',
+                fontSize: { xs: 16.5, md: 18.5 },
+                lineHeight: 1.95,
+                maxWidth: 560,
+                borderLeft: '3px solid rgba(255,255,255,0.3)',
+                pl: 2.5,
+              }}>
                 {config.description}
               </Typography>
             </Grid>
 
-            <Grid item xs={12} md={4}>
-              <Grid container spacing={1.5}>
-                {config.stats.map(({ label, value }) => (
-                  <Grid item xs={6} key={label}>
-                    <Box sx={{ background: 'rgba(255,255,255,0.14)', backdropFilter: 'blur(8px)', borderRadius: '14px', p: 2, textAlign: 'center', border: '1px solid rgba(255,255,255,0.2)' }}>
-                      <Typography sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 30, fontWeight: 700, color: '#fff', lineHeight: 1 }}>{value}</Typography>
-                      <Typography sx={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', mt: 0.5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{label}</Typography>
+            {/* ── DROITE — Carte infos (sans Encadrantes / Places / Ratio) ── */}
+            <Grid item xs={12} md={5}>
+              <Box sx={{
+                background: 'rgba(255,255,255,0.11)',
+                backdropFilter: 'blur(12px)',
+                borderRadius: '22px',
+                p: { xs: 3, md: 3.5 },
+                border: '1px solid rgba(255,255,255,0.2)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 2.75,
+              }}>
+                {[
+                  { icon: Users, label: 'Effectif',           value: config.effectif },
+                  { icon: Star,  label: 'Encadrement',         value: config.encadrement },
+                  { icon: Clock, label: "Horaires d'accueil",  value: '7h30 — 16h30' },
+                ].map(({ icon: I, label, value }) => (
+                  <Box key={label} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+                    <Box sx={{
+                      width: 44, height: 44,
+                      borderRadius: '13px',
+                      background: 'rgba(255,255,255,0.18)',
+                      border: '1px solid rgba(255,255,255,0.2)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      <I size={20} color="#fff" />
                     </Box>
-                  </Grid>
+                    <Box>
+                      <Typography sx={{ fontSize: 11.5, color: 'rgba(255,255,255,0.52)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                        {label}
+                      </Typography>
+                      <Typography sx={{ fontSize: 17, fontWeight: 700, color: '#fff', mt: 0.3, lineHeight: 1.35 }}>
+                        {value}
+                      </Typography>
+                    </Box>
+                  </Box>
                 ))}
-              </Grid>
+              </Box>
             </Grid>
+
           </Grid>
         </Container>
       </Box>
 
-      {/* ── PROGRAMME ── */}
-      <Box sx={{ py: { xs: 6, md: 8 }, background: '#fff' }}>
+      {/* ══════════ PROGRAMME ══════════ */}
+      <Box sx={{ py: { xs: 8, md: 11 }, background: '#fff' }}>
         <Container maxWidth="lg">
-          <Grid container spacing={5} alignItems="flex-start">
+          <Grid container spacing={6} alignItems="flex-start">
 
+            {/* ── GAUCHE — Objectifs + Activités + Fournitures ── */}
             <Grid item xs={12} md={7}>
-              <Typography sx={{ fontSize: 10, fontWeight: 700, color: config.color, letterSpacing: '2.5px', textTransform: 'uppercase', mb: 0.75 }}>
+
+              {/* Label supérieur */}
+              <Typography sx={{
+                fontSize: 12, fontWeight: 700, color: config.color,
+                letterSpacing: '2.5px', textTransform: 'uppercase', mb: 1,
+              }}>
                 Programme pédagogique
               </Typography>
-              <Typography variant="h2" sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 26, md: 36 }, fontWeight: 700, color: '#0c1a10', mb: 2 }}>
+
+              {/* Objectifs */}
+              <Typography variant="h2" sx={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: { xs: 34, md: 48 },
+                fontWeight: 700, color: '#0c1a10', mb: 2.5, lineHeight: 1.1,
+              }}>
                 Objectifs de la {config.titre}
               </Typography>
-              <Typography sx={{ color: '#6b7c70', fontSize: 14, lineHeight: 1.9, mb: 3 }}>
+              <Typography sx={{
+                color: '#5a6e62',
+                fontSize: { xs: 16, md: 17.5 },
+                lineHeight: 1.95,
+                mb: 5,
+              }}>
                 {config.objectifs}
               </Typography>
 
-              <Typography variant="h2" sx={{ fontFamily: "'Cormorant Garamond', serif", fontSize: { xs: 26, md: 36 }, fontWeight: 700, color: '#0c1a10', mb: 2 }}>
+              {/* Activités */}
+              <Typography variant="h2" sx={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: { xs: 32, md: 44 },
+                fontWeight: 700, color: '#0c1a10', mb: 2.5, lineHeight: 1.1,
+              }}>
                 Activités pratiquées
               </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mb: 3 }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.25, mb: 5 }}>
                 {config.activites.map((a) => (
-                  <Chip key={a} label={a} size="small"
-                    sx={{ background: config.accent, color: config.color, fontWeight: 600, fontSize: 11.5, border: `1px solid ${config.accentBorder}` }}
+                  <Chip key={a} label={a}
+                    sx={{
+                      background: config.accent,
+                      color: config.color,
+                      fontWeight: 700,
+                      fontSize: 14.5,
+                      border: `1px solid ${config.accentBorder}`,
+                      height: 38,
+                      px: 0.5,
+                    }}
                   />
                 ))}
               </Box>
 
-              <Box sx={{ background: '#f4fbf7', border: `1px solid ${config.accentBorder}`, borderLeft: `3px solid ${config.color}`, borderRadius: '10px', p: 2.5 }}>
+              {/* Fournitures */}
+              <Box sx={{
+                background: '#f4fbf7',
+                border: `1px solid ${config.accentBorder}`,
+                borderLeft: `4px solid ${config.color}`,
+                borderRadius: '14px',
+                p: { xs: 2.5, md: 3 },
+              }}>
                 <Box
                   onClick={() => setShowFournitures(!showFournitures)}
                   sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', userSelect: 'none' }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Package size={15} color={config.color} />
-                    <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: config.color, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Package size={19} color={config.color} />
+                    <Typography sx={{ fontSize: 15.5, fontWeight: 700, color: config.color, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       Liste de fournitures
                     </Typography>
-                    <Chip label="Officielle" size="small" sx={{ fontSize: 9, height: 18, background: config.accent, color: config.color, border: `1px solid ${config.accentBorder}` }} />
+                    <Chip label="Officielle" size="small" sx={{
+                      fontSize: 11.5, height: 23,
+                      background: config.accent, color: config.color,
+                      border: `1px solid ${config.accentBorder}`,
+                    }} />
                   </Box>
-                  <ChevronRight size={14} color={config.color} style={{ transform: showFournitures ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
+                  <ChevronRight
+                    size={18} color={config.color}
+                    style={{ transform: showFournitures ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }}
+                  />
                 </Box>
                 {showFournitures && (
-                  <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+                  <Box sx={{ mt: 2.5, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                     {config.fournitures.map((f) => (
-                      <Box key={f} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Box sx={{ width: 5, height: 5, borderRadius: '50%', background: config.color, flexShrink: 0 }} />
-                        <Typography sx={{ fontSize: 12.5, color: '#2d3a30' }}>{f}</Typography>
+                      <Box key={f} sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', background: config.color, flexShrink: 0 }} />
+                        <Typography sx={{ fontSize: 16, color: '#2d3a30', lineHeight: 1.55 }}>{f}</Typography>
                       </Box>
                     ))}
                   </Box>
@@ -205,45 +322,103 @@ function SectionPage({ config }) {
               </Box>
             </Grid>
 
+            {/* ── DROITE — Sidebar ── */}
             <Grid item xs={12} md={5}>
-              <Box sx={{ background: '#f4f8f5', borderRadius: '20px', p: 3, border: `1px solid ${config.accentBorder}` }}>
+              <Box sx={{
+                background: '#f4f8f5',
+                borderRadius: '22px',
+                p: { xs: 3, md: 4 },
+                border: `1px solid ${config.accentBorder}`,
+                position: 'sticky',
+                top: 24,
+              }}>
+
+                {/* Infos pratiques */}
                 {[
-                  { icon: Clock, label: "Horaires d'accueil",  value: '7h30 — 16h30' },
+                  { icon: Clock, label: "Horaires d'accueil", value: '7h30 — 16h30' },
                   { icon: Users, label: 'Effectif par classe',  value: config.effectif },
                   { icon: Star,  label: 'Encadrement',          value: config.encadrement },
                 ].map(({ icon: I, label, value }) => (
-                  <Box key={label} sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', mb: 2.5 }}>
-                    <Box sx={{ width: 36, height: 36, borderRadius: '10px', background: config.accent, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: `1px solid ${config.accentBorder}` }}>
-                      <I size={16} color={config.color} />
+                  <Box key={label} sx={{ display: 'flex', gap: 2.25, alignItems: 'flex-start', mb: 3.5 }}>
+                    <Box sx={{
+                      width: 48, height: 48,
+                      borderRadius: '13px',
+                      background: config.accent,
+                      border: `1px solid ${config.accentBorder}`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0,
+                    }}>
+                      <I size={22} color={config.color} />
                     </Box>
                     <Box>
-                      <Typography sx={{ fontSize: 10, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.8px' }}>{label}</Typography>
-                      <Typography sx={{ fontSize: 13.5, fontWeight: 600, color: '#0c1a10', mt: 0.25 }}>{value}</Typography>
+                      <Typography sx={{ fontSize: 12, color: '#9ca3af', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                        {label}
+                      </Typography>
+                      <Typography sx={{ fontSize: 17, fontWeight: 700, color: '#0c1a10', mt: 0.35, lineHeight: 1.35 }}>
+                        {value}
+                      </Typography>
                     </Box>
                   </Box>
                 ))}
 
-                <Box sx={{ mt: 2, p: 2, background: config.accent, borderRadius: '12px', border: `1px solid ${config.accentBorder}` }}>
-                  <Typography sx={{ fontSize: 10, fontWeight: 700, color: config.color, textTransform: 'uppercase', letterSpacing: '0.8px', mb: 1 }}>Scolarité 2025-2026</Typography>
-                  <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#0c1a10' }}>
-                    50 000 F + 6 000 F{' '}
-                    <Typography component="span" sx={{ fontSize: 10, color: '#6b7c70', fontWeight: 400 }}>(fêtes & photos)</Typography>
+                {/* Scolarité */}
+                <Box sx={{
+                  p: { xs: 2.5, md: 3 },
+                  background: config.accent,
+                  borderRadius: '16px',
+                  border: `1px solid ${config.accentBorder}`,
+                  mb: 3.5,
+                }}>
+                  <Typography sx={{ fontSize: 12, fontWeight: 700, color: config.color, textTransform: 'uppercase', letterSpacing: '1px', mb: 1.5 }}>
+                    Scolarité 2025-2026
                   </Typography>
-                  <Typography sx={{ fontSize: 11, color: '#6b7c70', mt: 0.5 }}>Cantine facultative : 8 000 F/mois</Typography>
-                  <Typography sx={{ fontSize: 10.5, color: config.color, mt: 0.5, fontStyle: 'italic' }}>Goûter + tenue de sport inclus</Typography>
+                  <Typography sx={{ fontSize: 26, fontWeight: 800, color: '#0c1a10', lineHeight: 1.2 }}>
+                    50 000 F
+                  </Typography>
+                  <Typography sx={{ fontSize: 15, color: '#6b7c70', mt: 0.5 }}>
+                    + 6 000 F{' '}
+                    <Box component="span" sx={{ fontStyle: 'italic', fontSize: 14 }}>(fêtes & photos)</Box>
+                  </Typography>
+                  <Typography sx={{ fontSize: 15.5, color: '#5a6e62', mt: 1.5, fontWeight: 600 }}>
+                    Cantine facultative : <strong>8 000 F / mois</strong>
+                  </Typography>
+                  <Typography sx={{ fontSize: 14.5, color: config.color, mt: 0.75, fontStyle: 'italic', fontWeight: 600 }}>
+                    Goûter + tenue de sport inclus
+                  </Typography>
                 </Box>
 
-                <Box sx={{ mt: 2.5, pt: 2, borderTop: `1px solid ${config.accentBorder}`, textAlign: 'center' }}>
-                  <Typography sx={{ fontSize: 12.5, color: '#6b7c70', mb: 1.5 }}>Inscriptions ouvertes · dès le 1er Sept. 2025</Typography>
+                {/* CTA */}
+                <Box sx={{ textAlign: 'center' }}>
+                  <Typography sx={{ fontSize: 15, color: '#6b7c70', mb: 2 }}>
+                    Inscriptions ouvertes · dès le 1er Sept. 2025
+                  </Typography>
                   <Button
-                    component={Link} to="/inscription" variant="contained" fullWidth
-                    sx={{ background: config.color, py: 1.2, borderRadius: '10px', fontWeight: 700, '&:hover': { background: config.darkColor, transform: 'translateY(-1px)' }, transition: 'all 0.2s' }}
+                    component={Link}
+                    to="/inscription"
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                      background: `linear-gradient(135deg, ${config.darkColor}, ${config.color})`,
+                      py: 1.7,
+                      borderRadius: '13px',
+                      fontWeight: 800,
+                      fontSize: 17,
+                      letterSpacing: '0.3px',
+                      '&:hover': {
+                        background: `linear-gradient(135deg, ${config.color}, ${config.darkColor})`,
+                        transform: 'translateY(-2px)',
+                        boxShadow: `0 12px 32px ${config.color}45`,
+                      },
+                      transition: 'all 0.25s',
+                    }}
                   >
                     Inscrire mon enfant
                   </Button>
                 </Box>
+
               </Box>
             </Grid>
+
           </Grid>
         </Container>
       </Box>
