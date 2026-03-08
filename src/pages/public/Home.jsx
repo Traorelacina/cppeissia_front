@@ -34,6 +34,8 @@ import {
   CalendarDays,
   Pause,
   Play,
+  Megaphone,
+  Radio,
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { actualitesApi, parametresApi, activitesApi } from '@/api/services'
@@ -59,6 +61,7 @@ function Hero({ params }) {
         background: 'linear-gradient(135deg, #0a2e18 0%, #0f4a25 50%, #1a5e32 100%)',
         display: 'grid',
         gridTemplateColumns: { xs: '1fr', md: '55% 45%' },
+        gridTemplateRows: { xs: 'auto auto', md: '1fr' },
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -68,7 +71,7 @@ function Hero({ params }) {
 
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', px: { xs: 3, md: 5 }, py: { xs: 10, md: 6 }, position: 'relative', zIndex: 1 }}>
         <Chip
-          label="🇨🇮  Ministère de la Femme, de la Famille et de l'Enfant"
+          label="Ministère de la Femme, de la Famille et de l'Enfant"
           size="small"
           sx={{ mb: 3, background: `rgba(255,127,39,0.12)`, border: `1px solid rgba(255,127,39,0.3)`, color: ORANGE, fontWeight: 600, fontSize: 11, alignSelf: 'flex-start' }}
         />
@@ -90,9 +93,9 @@ function Hero({ params }) {
         </Box>
       </Box>
 
-      <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', justifyContent: 'center', px: 4, py: 6, position: 'relative', zIndex: 1 }}>
-        <Box sx={{ position: 'absolute', width: 'calc(100% - 56px)', aspectRatio: '1 / 1', maxWidth: 420, border: `2px solid rgba(255,127,39,0.4)`, borderRadius: '24px', top: '50%', left: '50%', transform: 'translate(calc(-50% + 10px), calc(-50% + 10px))', pointerEvents: 'none' }} />
-        <Box sx={{ width: '100%', maxWidth: 420, aspectRatio: '1 / 1', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)', position: 'relative', flexShrink: 0 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', px: { xs: 3, md: 4 }, py: { xs: 4, md: 6 }, pb: { xs: 6, md: 6 }, position: 'relative', zIndex: 1 }}>
+        <Box sx={{ position: 'absolute', width: 'calc(100% - 56px)', aspectRatio: '1 / 1', maxWidth: 420, border: `2px solid rgba(255,127,39,0.4)`, borderRadius: '24px', top: '50%', left: '50%', transform: 'translate(calc(-50% + 10px), calc(-50% + 10px))', pointerEvents: 'none', display: { xs: 'none', md: 'block' } }} />
+        <Box sx={{ width: '100%', maxWidth: { xs: 320, md: 420 }, aspectRatio: '1 / 1', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.08)', position: 'relative', flexShrink: 0 }}>
           <Box component="img" src={ecoleImage} alt="École CPPE Issia"
             sx={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', display: 'block', transition: 'transform 8s ease', '&:hover': { transform: 'scale(1.04)' } }} />
           <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40%', background: 'linear-gradient(to top, rgba(10,46,24,0.7) 0%, transparent 100%)', pointerEvents: 'none' }} />
@@ -109,31 +112,126 @@ function Hero({ params }) {
 }
 
 // ========================
-// INFO BAR
+// FLASH TICKER STYLES
 // ========================
-function InfoBar({ params }) {
+const TICKER_STYLES = `
+  @keyframes pulse-dot {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50%       { transform: scale(1.5); opacity: 0.5; }
+  }
+  @keyframes ticker-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .flash-ticker-track {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    animation: ticker-scroll 18s linear infinite;
+    will-change: transform;
+  }
+  .flash-ticker-track:hover {
+    animation-play-state: paused;
+  }
+  .flash-ticker-sep {
+    display: inline-block;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgba(15,74,37,0.45);
+    margin: 0 18px;
+    flex-shrink: 0;
+    vertical-align: middle;
+  }
+`
+
+// Composant réutilisable (Home InfoBar + Footer)
+export function FlashTicker({ params, flashItems = [] }) {
   const isOpen      = params?.inscriptions_ouvertes !== 'false'
   const annee       = params?.annee_scolaire_courante || '2025-2026'
   const horaires    = params?.horaires || 'du lundi au vendredi de 7h30 à 16h30'
   const dateRentree = params?.date_rentree || '06 octobre 2025'
 
-  if (!isOpen) return null
+  // Construit la liste des items du ticker
+  const tickerItems = [
+    ...(isOpen ? [{
+      id: '__inscription__',
+      isInscription: true,
+      text: `Inscriptions ${annee} ouvertes — ${horaires.charAt(0).toUpperCase() + horaires.slice(1)} · Rentrée le ${dateRentree}`,
+    }] : []),
+    ...flashItems
+      .slice()
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .map(a => ({
+        id: a.id,
+        text: (a.contenu || '').replace(/\*\*|__|_/g, '').trim(),
+        isInscription: false,
+      }))
+      .filter(a => a.text),
+  ]
+
+  if (!tickerItems.length) return null
+
+  // Duplique pour boucle seamless
+  const doubled = [...tickerItems, ...tickerItems]
 
   return (
-    <Box sx={{ background: ORANGE, py: 1.25 }}>
-      <Container maxWidth="lg">
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
-          <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: '#0f4a25', flexShrink: 0, animation: 'pulse-dot 2s infinite' }} />
-          <Typography sx={{ color: '#0f4a25', fontWeight: 700, fontSize: 12.5, flex: 1 }}>
-            Inscriptions {annee} ouvertes — {horaires.charAt(0).toUpperCase() + horaires.slice(1)} · Rentrée le {dateRentree}
-          </Typography>
-          <Button component={Link} to="/flash-infos" size="small" sx={{ color: '#0f4a25', fontWeight: 800, fontSize: 11.5, textDecoration: 'underline', minWidth: 'auto', p: 0 }}>
-            Voir toutes les infos →
-          </Button>
-        </Box>
-      </Container>
+    <Box sx={{ background: ORANGE, py: 0, overflow: 'hidden', height: 38, display: 'flex', alignItems: 'center', position: 'relative' }}>
+      <style>{TICKER_STYLES}</style>
+
+      {/* Badge fixe gauche */}
+      <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 1, px: 2, height: '100%', background: '#0f4a25', zIndex: 2, borderRight: '2px solid rgba(255,127,39,0.4)' }}>
+        <Radio size={13} color={ORANGE} />
+        <Typography sx={{ color: ORANGE, fontWeight: 800, fontSize: 11, letterSpacing: '1.5px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+          Flash infos
+        </Typography>
+      </Box>
+
+      {/* Piste défilante */}
+      <Box sx={{ flex: 1, overflow: 'hidden', height: '100%', display: 'flex', alignItems: 'center' }}>
+        <div className="flash-ticker-track">
+          {doubled.map((item, idx) => (
+            <Box
+              key={`${item.id}-${idx}`}
+              component="span"
+              sx={{ display: 'inline-flex', alignItems: 'center', gap: 1, px: 0 }}
+            >
+              {item.isInscription && (
+                <Box component="span" sx={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#0f4a25', mr: 1, animation: 'pulse-dot 2s infinite', verticalAlign: 'middle', flexShrink: 0 }} />
+              )}
+              <Typography
+                component="span"
+                sx={{
+                  color: '#0f4a25',
+                  fontWeight: item.isInscription ? 800 : 600,
+                  fontSize: 12.5,
+                  lineHeight: '38px',
+                }}
+              >
+                {item.text}
+              </Typography>
+              <span className="flash-ticker-sep" />
+            </Box>
+          ))}
+        </div>
+      </Box>
+
+      {/* Lien droite fixe */}
+      <Box
+        component={Link}
+        to="/flash-infos"
+        sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 0.5, px: 2, height: '100%', background: '#0f4a25', borderLeft: '2px solid rgba(255,127,39,0.4)', textDecoration: 'none', '&:hover': { background: '#0a2e18' }, transition: 'background 0.2s', zIndex: 2 }}
+      >
+       
+      </Box>
     </Box>
   )
+}
+
+// ========================
+// INFO BAR
+// ========================
+function InfoBar({ params, flashItems }) {
+  return <FlashTicker params={params} flashItems={flashItems} />
 }
 
 // ========================
@@ -716,6 +814,11 @@ export default function Home() {
     queryFn:  () => actualitesApi.getAll({ per_page: 3 }),
   })
 
+  const { data: flashData } = useQuery({
+    queryKey: ['flash-infos-ticker'],
+    queryFn:  () => actualitesApi.getAll({ type: 'flash', statut: 'publie', per_page: 20 }),
+  })
+
   const { data: parametresData } = useQuery({
     queryKey: ['parametres-public'],
     queryFn:  () => parametresApi.getAll(),
@@ -727,18 +830,19 @@ export default function Home() {
     queryFn:  () => activitesApi.getAll(),
   })
 
-  const params    = parametresData?.data?.data       || {}
-  const activites = activitesData?.data?.data?.data  || []
+  const params     = parametresData?.data?.data       || {}
+  const activites  = activitesData?.data?.data?.data  || []
+  const flashItems = flashData?.data?.data?.data       || []
 
   return (
     <Box>
-      <Hero                    params={params} />
-      <InfoBar                 params={params} />
-      <MotDirecteurSection     params={params} />
+      <Hero                     params={params} />
+      <InfoBar                  params={params} flashItems={flashItems} />
+      <MotDirecteurSection      params={params} />
       <ActivitesCarouselSection activites={activites} />
       <SectionsSection />
-      <InscriptionCTA          params={params} />
-      <ContactRapide           params={params} />
+      <InscriptionCTA           params={params} />
+      <ContactRapide            params={params} />
     </Box>
   )
 }

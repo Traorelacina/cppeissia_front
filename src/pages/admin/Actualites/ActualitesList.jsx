@@ -71,6 +71,16 @@ export default function ActualitesList() {
 
   const actualites = data?.data?.data?.data || []
 
+  // Fonction pour extraire un aperçu du contenu (premiers mots)
+  const getContentPreview = (content, maxLength = 50) => {
+    if (!content) return '—'
+    // Supprime les balises markdown simples pour l'affichage
+    const plainText = content.replace(/[*_~`#]/g, '')
+    return plainText.length > maxLength 
+      ? plainText.substring(0, maxLength) + '…' 
+      : plainText
+  }
+
   return (
     <Box>
       <PageTitle
@@ -94,7 +104,7 @@ export default function ActualitesList() {
         <Box sx={{ display: 'flex', gap: 2, p: 2, borderBottom: '1px solid #dae8df', flexWrap: 'wrap' }}>
           <TextField
             size="small"
-            placeholder="Rechercher..."
+            placeholder="Rechercher dans le contenu..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
@@ -144,7 +154,7 @@ export default function ActualitesList() {
           <Table>
             <TableHead>
               <TableRow sx={{ background: '#f9fbf9' }}>
-                <TableCell>Titre</TableCell>
+                <TableCell>Contenu</TableCell>
                 <TableCell>Type</TableCell>
                 <TableCell>Auteur</TableCell>
                 <TableCell>Date publication</TableCell>
@@ -157,7 +167,7 @@ export default function ActualitesList() {
                 <TableRow key={actu.id} hover>
                   <TableCell>
                     <Typography sx={{ fontWeight: 600, fontSize: 13, color: '#0c1a10', maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {actu.titre}
+                      {getContentPreview(actu.contenu)}
                     </Typography>
                   </TableCell>
                   <TableCell>

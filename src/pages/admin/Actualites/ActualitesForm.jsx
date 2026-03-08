@@ -94,7 +94,7 @@ function RichTextarea({ value, onChange, hasError, placeholder }) {
 
 const TYPES = [
   { value: 'flash',       label: 'Flash Info' },
-
+  // Ajoutez d'autres types ici si nécessaire
 ]
 
 export default function ActualitesForm() {
@@ -105,10 +105,9 @@ export default function ActualitesForm() {
 
   const { register, handleSubmit, control, reset, watch, formState: { errors } } = useForm({
     defaultValues: {
-      titre: '',
       contenu: '',
-      type: 'flash',        // ← valeur initiale valide
-      statut: 'brouillon',  // ← valeur initiale valide
+      type: 'flash',
+      statut: 'brouillon',
       date_publication: '',
       date_expiration: '',
     },
@@ -129,7 +128,6 @@ export default function ActualitesForm() {
   useEffect(() => {
     if (existingData) {
       reset({
-        titre:            existingData.titre || '',
         contenu:          existingData.contenu || '',
         type:             existingData.type || 'flash',
         statut:           existingData.statut || 'brouillon',
@@ -169,7 +167,7 @@ export default function ActualitesForm() {
         title={isEditing ? "Modifier l'actualité" : 'Nouvelle actualité'}
         subtitle={
           isEditing
-            ? `Modification de : ${existingData?.titre || ''}`
+            ? `Modification de l'actualité`
             : 'Créez un flash info, une convocation ou une annonce.'
         }
       />
@@ -183,15 +181,6 @@ export default function ActualitesForm() {
               <Typography sx={{ fontWeight: 700, fontSize: 13, color: '#0c1a10', mb: 2.5, pb: 1.5, borderBottom: '1px solid #dae8df' }}>
                 Contenu
               </Typography>
-
-              <TextField
-                label="Titre *"
-                fullWidth
-                error={!!errors.titre}
-                helperText={errors.titre?.message}
-                sx={{ mb: 3 }}
-                {...register('titre', { required: 'Le titre est obligatoire.' })}
-              />
 
               <Typography sx={{ fontSize: 12.5, fontWeight: 600, color: '#6b7c70', mb: 1 }}>
                 Contenu *

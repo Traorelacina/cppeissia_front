@@ -1,25 +1,25 @@
 import { Link } from 'react-router-dom'
 import { Box, Container, Grid, Typography, Divider } from '@mui/material'
-import { MapPin, Phone, Mail, Clock, ArrowUpRight } from 'lucide-react'
+import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
-import { parametresApi } from '@/api/services'
-import logo from '@/assets/logo.jpeg' // Import du logo réel
+import { parametresApi, actualitesApi } from '@/api/services'
+import { FlashTicker } from '@/pages/public/Home'
+import logo from '@/assets/logo.jpeg'
 
-// COULEUR ORANGE DU MINISTÈRE
 const ORANGE = '#FF7F27'
 
 const LINKS = {
   etablissement: [
-    { label: 'Présentation', href: '/presentation' },
-    { label: 'Mot du Directeur', href: '/mot-du-directeur' },
-    { label: 'Flash Infos', href: '/flash-infos' },
+    { label: 'Présentation',       href: '/presentation' },
+    { label: 'Mot du Directeur',   href: '/mot-du-directeur' },
+    { label: 'Flash Infos',        href: '/flash-infos' },
     { label: 'Calendrier scolaire', href: '/calendrier' },
   ],
   sections: [
-    { label: 'Crèche', href: '/sections/creche' },
-    { label: 'Petite Section', href: '/sections/petite-section' },
+    { label: 'Crèche',          href: '/sections/creche' },
+    { label: 'Petite Section',  href: '/sections/petite-section' },
     { label: 'Moyenne Section', href: '/sections/moyenne-section' },
-    { label: 'Grande Section', href: '/sections/grande-section' },
+    { label: 'Grande Section',  href: '/sections/grande-section' },
   ],
 }
 
@@ -30,15 +30,22 @@ export default function PublicFooter() {
     staleTime: 5 * 60 * 1000,
   })
 
-  const params = parametresData?.data?.data || {}
+  // Même queryKey que Home → cache partagé, pas de double requête réseau
+  const { data: flashData } = useQuery({
+    queryKey: ['flash-infos-ticker'],
+    queryFn:  () => actualitesApi.getAll({ type: 'flash', statut: 'publie', per_page: 20 }),
+  })
 
-  const isOpen      = params.inscriptions_ouvertes !== 'false'
-  const annee       = params.annee_scolaire_courante || '2025-2026'
-  const adresse     = params.adresse   || "Complexe Socio-Éducatif d'Issia, Haut-Sassandra"
-  const telephone   = params.telephone || '07 07 18 65 59 / 05 06 48 22 01'
-  const email       = params.email     || 'direction@cppe-issia.ci'
-  const horaires    = params.horaires  || 'Lun–Ven  ·  7h30 – 16h30'
-  const montant     = params.scolarite_montant
+  const params     = parametresData?.data?.data || {}
+  const flashItems = flashData?.data?.data?.data || []
+
+  const isOpen    = params.inscriptions_ouvertes !== 'false'
+  const annee     = params.annee_scolaire_courante || '2025-2026'
+  const adresse   = params.adresse   || "Complexe Socio-Éducatif d'Issia, Haut-Sassandra"
+  const telephone = params.telephone || '07 07 18 65 59 / 05 06 48 22 01'
+  const email     = params.email     || 'direction@cppe-issia.ci'
+  const horaires  = params.horaires  || 'Lun–Ven  ·  7h30 – 16h30'
+  const montant   = params.scolarite_montant
     ? Number(params.scolarite_montant).toLocaleString('fr-FR')
     : '50 000'
 
@@ -47,28 +54,16 @@ export default function PublicFooter() {
   return (
     <Box component="footer" sx={{ background: '#0c1a10', color: 'rgba(255,255,255,0.6)', mt: 0 }}>
 
-      {/* BANDE SUPÉRIEURE - MODIFIÉE : couleur orange et sans bouton */}
-      {isOpen && (
-        <Box sx={{ background: ORANGE, py: 1.25 }}>
-          <Container maxWidth="lg">
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
-              <Box sx={{ width: 7, height: 7, borderRadius: '50%', background: '#0f4a25', flexShrink: 0, animation: 'pulse-dot 2s infinite' }} />
-              <Typography sx={{ color: '#0f4a25', fontWeight: 700, fontSize: 12.5, flex: 1 }}>
-                Inscriptions {annee} ouvertes — {horaires.charAt(0).toUpperCase() + horaires.slice(1)}
-              </Typography>
-            </Box>
-          </Container>
-        </Box>
-      )}
+      {/* ── BANDE TICKER DÉFILANTE ── */}
+      <FlashTicker params={params} flashItems={flashItems} />
 
-      {/* CORPS DU FOOTER */}
+      {/* ── CORPS DU FOOTER ── */}
       <Container maxWidth="lg" sx={{ py: 6 }}>
         <Grid container spacing={4}>
 
           {/* BLOC 1 — IDENTITÉ + CONTACT */}
           <Grid item xs={12} md={4}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
-              {/* Logo réel */}
               <Box
                 sx={{
                   width: 50,
@@ -83,15 +78,10 @@ export default function PublicFooter() {
                   border: '2px solid rgba(255,127,39,0.3)',
                 }}
               >
-                <img 
-                  src={logo} 
-                  alt="Logo CPPE Issia" 
-                  style={{ 
-                    width: '100%', 
-                    height: '100%', 
-                    objectFit: 'contain',
-                    display: 'block'
-                  }} 
+                <img
+                  src={logo}
+                  alt="Logo CPPE Issia"
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                 />
               </Box>
               <Box>
@@ -186,11 +176,11 @@ export default function PublicFooter() {
               }}
             >
               {[
-                ['Montant annuel', `${montant} FCFA`],
-                ['1er versement', "À l'inscription"],
-                ['2e versement', `Fin Novembre ${anneeVersement}`],
-                ['3e versement', `Fin Décembre ${anneeVersement}`],
-                ['Cantine', 'En option'],
+                ['Montant annuel',  `${montant} FCFA`],
+                ['1er versement',  "À l'inscription"],
+                ['2e versement',   `Fin Novembre ${anneeVersement}`],
+                ['3e versement',   `Fin Décembre ${anneeVersement}`],
+                ['Cantine',        'En option'],
               ].map(([label, value]) => (
                 <Box
                   key={label}
@@ -208,23 +198,17 @@ export default function PublicFooter() {
 
       <Divider sx={{ borderColor: 'rgba(255,255,255,0.06)' }} />
 
-      {/* BAS DU FOOTER */}
+      {/* ── BAS DU FOOTER ── */}
       <Box sx={{ py: 2 }}>
         <Container maxWidth="lg">
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box 
-                  component="img" 
-                  src={logo} 
-                  alt="Logo" 
-                  sx={{ 
-                    width: 24, 
-                    height: 24, 
-                    objectFit: 'contain',
-                    opacity: 0.5,
-                    filter: 'brightness(0) invert(1)'
-                  }} 
+                <Box
+                  component="img"
+                  src={logo}
+                  alt="Logo"
+                  sx={{ width: 24, height: 24, objectFit: 'contain', opacity: 0.5, filter: 'brightness(0) invert(1)' }}
                 />
                 <Typography sx={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>
                   © {new Date().getFullYear()} CPPE ISSIA
