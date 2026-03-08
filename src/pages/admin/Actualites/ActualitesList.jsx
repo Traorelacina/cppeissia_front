@@ -31,19 +31,58 @@ import {
   EyeOff,
   Newspaper,
   Filter,
+  CalendarX2,
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { actualitesApi } from '@/api/services'
 import { PageTitle, StatusBadge, LoadingSpinner, EmptyState, TableSkeleton } from '@/components/common'
-import { format } from 'date-fns'
+import { format, isPast, isToday } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import toast from 'react-hot-toast'
 
+// Affichage de la date d'expiration avec indicateur visuel
+function ExpirationCell({ date }) {
+  if (!date) return <Typography sx={{ fontSize: 12.5, color: '#c4cdd0' }}>—</Typography>
+
+  const d      = new Date(date)
+  const expire = isPast(d) && !isToday(d)
+  const today  = isToday(d)
+
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+      <CalendarX2
+        size={13}
+        color={expire ? '#dc2626' : today ? '#f59e0b' : '#6b7c70'}
+      />
+      <Typography
+        sx={{
+          fontSize: 12.5,
+          whiteSpace: 'nowrap',
+          fontWeight: expire || today ? 700 : 400,
+          color: expire ? '#dc2626' : today ? '#f59e0b' : '#6b7c70',
+        }}
+      >
+        {format(d, 'dd MMM yyyy', { locale: fr })}
+        {expire && (
+          <Box component="span" sx={{ ml: 0.75, fontSize: 10, background: '#fee2e2', color: '#dc2626', px: 0.75, py: 0.2, borderRadius: '4px', fontWeight: 700 }}>
+            Expiré
+          </Box>
+        )}
+        {today && (
+          <Box component="span" sx={{ ml: 0.75, fontSize: 10, background: '#fef3c7', color: '#d97706', px: 0.75, py: 0.2, borderRadius: '4px', fontWeight: 700 }}>
+            Aujourd'hui
+          </Box>
+        )}
+      </Typography>
+    </Box>
+  )
+}
+
 export default function ActualitesList() {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const [search, setSearch] = useState('')
-  const [statut, setStatut] = useState('')
+  const navigate     = useNavigate()
+  const queryClient  = useQueryClient()
+  const [search,   setSearch]   = useState('')
+  const [statut,   setStatut]   = useState('')
   const [deleteId, setDeleteId] = useState(null)
 
   const { data, isLoading } = useQuery({
@@ -71,13 +110,11 @@ export default function ActualitesList() {
 
   const actualites = data?.data?.data?.data || []
 
-  // Fonction pour extraire un aperçu du contenu (premiers mots)
-  const getContentPreview = (content, maxLength = 50) => {
+  const getContentPreview = (content, maxLength = 60) => {
     if (!content) return '—'
-    // Supprime les balises markdown simples pour l'affichage
     const plainText = content.replace(/[*_~`#]/g, '')
-    return plainText.length > maxLength 
-      ? plainText.substring(0, maxLength) + '…' 
+    return plainText.length > maxLength
+      ? plainText.substring(0, maxLength) + '…'
       : plainText
   }
 
@@ -131,7 +168,7 @@ export default function ActualitesList() {
 
         {isLoading ? (
           <Box sx={{ p: 2 }}>
-            <TableSkeleton rows={6} cols={5} />
+            <TableSkeleton rows={6} cols={6} />
           </Box>
         ) : actualites.length === 0 ? (
           <EmptyState
@@ -158,6 +195,7 @@ export default function ActualitesList() {
                 <TableCell>Type</TableCell>
                 <TableCell>Auteur</TableCell>
                 <TableCell>Date publication</TableCell>
+                <TableCell>Date d'expiration</TableCell>
                 <TableCell>Statut</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
@@ -165,40 +203,44 @@ export default function ActualitesList() {
             <TableBody>
               {actualites.map((actu) => (
                 <TableRow key={actu.id} hover>
+
+                  {/* Contenu */}
                   <TableCell>
-                    <Typography sx={{ fontWeight: 600, fontSize: 13, color: '#0c1a10', maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <Typography sx={{ fontWeight: 600, fontSize: 13, color: '#0c1a10', maxWidth: 260, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                       {getContentPreview(actu.contenu)}
                     </Typography>
                   </TableCell>
+
+                  {/* Type */}
                   <TableCell>
-                    <Box
-                      sx={{
-                        display: 'inline-block',
-                        px: 1,
-                        py: 0.3,
-                        borderRadius: '4px',
-                        fontSize: 10,
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
-                        background: '#eaf4ee',
-                        color: '#1B7A3E',
-                      }}
-                    >
+                    <Box sx={{ display: 'inline-block', px: 1, py: 0.3, borderRadius: '4px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', background: '#eaf4ee', color: '#1B7A3E' }}>
                       {actu.type}
                     </Box>
                   </TableCell>
+
+                  {/* Auteur */}
                   <TableCell sx={{ fontSize: 12.5, color: '#6b7c70' }}>
                     {actu.auteur?.name || '—'}
                   </TableCell>
+
+                  {/* Date publication */}
                   <TableCell sx={{ fontSize: 12.5, color: '#6b7c70', whiteSpace: 'nowrap' }}>
                     {actu.date_publication
                       ? format(new Date(actu.date_publication), 'dd MMM yyyy', { locale: fr })
                       : '—'}
                   </TableCell>
+
+                  {/* Date d'expiration */}
+                  <TableCell>
+                    <ExpirationCell date={actu.date_expiration} />
+                  </TableCell>
+
+                  {/* Statut */}
                   <TableCell>
                     <StatusBadge status={actu.statut} />
                   </TableCell>
+
+                  {/* Actions */}
                   <TableCell align="right">
                     <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
                       <Tooltip title={actu.statut === 'publie' ? 'Dépublier' : 'Publier'}>
@@ -230,6 +272,7 @@ export default function ActualitesList() {
                       </Tooltip>
                     </Box>
                   </TableCell>
+
                 </TableRow>
               ))}
             </TableBody>
