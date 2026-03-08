@@ -71,7 +71,7 @@ function Hero({ params }) {
 
       <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', px: { xs: 3, md: 5 }, py: { xs: 10, md: 6 }, position: 'relative', zIndex: 1 }}>
         <Chip
-          label="Ministère de la Femme, de la Famille et de l'Enfant"
+          label="🇨🇮  Ministère de la Femme, de la Famille et de l'Enfant"
           size="small"
           sx={{ mb: 3, background: `rgba(255,127,39,0.12)`, border: `1px solid rgba(255,127,39,0.3)`, color: ORANGE, fontWeight: 600, fontSize: 11, alignSelf: 'flex-start' }}
         />
@@ -180,8 +180,8 @@ export function FlashTicker({ params, flashItems = [] }) {
 
       {/* Badge fixe gauche */}
       <Box sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 1, px: 2, height: '100%', background: '#0f4a25', zIndex: 2, borderRight: '2px solid rgba(255,127,39,0.4)' }}>
-        <Radio size={13} color={ORANGE} />
-        <Typography sx={{ color: ORANGE, fontWeight: 800, fontSize: 11, letterSpacing: '1.5px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
+        <Radio size={13} color="#fff" />
+        <Typography sx={{ color: '#fff', fontWeight: 800, fontSize: 11, letterSpacing: '1.5px', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>
           Flash infos
         </Typography>
       </Box>
@@ -221,7 +221,6 @@ export function FlashTicker({ params, flashItems = [] }) {
         to="/flash-infos"
         sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 0.5, px: 2, height: '100%', background: '#0f4a25', borderLeft: '2px solid rgba(255,127,39,0.4)', textDecoration: 'none', '&:hover': { background: '#0a2e18' }, transition: 'background 0.2s', zIndex: 2 }}
       >
-       
       </Box>
     </Box>
   )
@@ -740,15 +739,15 @@ function InscriptionCTA({ params }) {
             {isOpen ? `Inscriptions ouvertes ${horaires} au secrétariat du CPPE. Structure ouverte aux enfants de 1 an 6 mois à 5 ans.` : 'Les inscriptions sont actuellement fermées. Préparez dès maintenant les pièces nécessaires.'}
           </Typography>
         </Box>
-        <Grid container spacing={2.5}>
-          <Grid item xs={12} md={4}>
-            <Box sx={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', p: 3, height: '100%', transition: 'all 0.32s cubic-bezier(0.4,0,0.2,1)', cursor: 'default', '&:hover': { background: 'rgba(255,255,255,0.11)', border: '1px solid rgba(255,127,39,0.5)', transform: 'translateY(-8px)', boxShadow: '0 24px 48px rgba(0,0,0,0.25)' } }}>
+        <Grid container spacing={2.5} alignItems="stretch" justifyContent="center">
+          <Grid item xs={12} md={4} sx={{ display: 'flex' }}>
+            <Box sx={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', p: 3, width: '100%', display: 'flex', flexDirection: 'column', transition: 'all 0.32s cubic-bezier(0.4,0,0.2,1)', cursor: 'default', '&:hover': { background: 'rgba(255,255,255,0.11)', border: '1px solid rgba(255,127,39,0.5)', transform: 'translateY(-8px)', boxShadow: '0 24px 48px rgba(0,0,0,0.25)' } }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 2.5 }}><Box sx={{ width: 32, height: 32, borderRadius: '10px', background: `rgba(255,127,39,0.15)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><ShieldCheck size={16} color={ORANGE} /></Box><Typography sx={{ color: ORANGE, fontWeight: 700, fontSize: 12.5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pièces à fournir</Typography></Box>
               {dossier.map(item => (<Box key={item.label} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25, mb: 2 }}><CheckCircle size={15} color={ORANGE} style={{ flexShrink: 0, marginTop: 2 }} /><Box><Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: 600, lineHeight: 1.3 }}>{item.label}</Typography><Typography sx={{ color: 'rgba(255,255,255,0.42)', fontSize: 11.5, lineHeight: 1.55, mt: 0.25 }}>{item.detail}</Typography></Box></Box>))}
             </Box>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <Box sx={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', p: 3, height: '100%', transition: 'all 0.32s cubic-bezier(0.4,0,0.2,1)', cursor: 'default', '&:hover': { background: 'rgba(255,255,255,0.11)', border: '1px solid rgba(255,127,39,0.5)', transform: 'translateY(-8px)', boxShadow: '0 24px 48px rgba(0,0,0,0.25)' } }}>
+          <Grid item xs={12} md={4} sx={{ display: 'flex' }}>
+            <Box sx={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', p: 3, width: '100%', display: 'flex', flexDirection: 'column', transition: 'all 0.32s cubic-bezier(0.4,0,0.2,1)', cursor: 'default', '&:hover': { background: 'rgba(255,255,255,0.11)', border: '1px solid rgba(255,127,39,0.5)', transform: 'translateY(-8px)', boxShadow: '0 24px 48px rgba(0,0,0,0.25)' } }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 2.5 }}><Box sx={{ width: 32, height: 32, borderRadius: '10px', background: `rgba(255,127,39,0.15)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><CreditCard size={16} color={ORANGE} /></Box><Typography sx={{ color: ORANGE, fontWeight: 700, fontSize: 12.5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Scolarité {annee}</Typography></Box>
               <Box sx={{ mb: 2.5, p: 2, background: `rgba(255,127,39,0.08)`, borderRadius: '12px', border: `1px solid rgba(255,127,39,0.2)` }}>
                 <Typography sx={{ color: 'rgba(255,255,255,0.45)', fontSize: 11, mb: 0.25 }}>Montant annuel</Typography>
@@ -758,8 +757,8 @@ function InscriptionCTA({ params }) {
               {versements.map((v, i) => (<Box key={v.label} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1.5, pb: 1.5, borderBottom: i < versements.length - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none' }}><Box><Typography sx={{ color: 'rgba(255,255,255,0.85)', fontSize: 12.5, fontWeight: 600 }}>{v.label}</Typography><Typography sx={{ color: 'rgba(255,255,255,0.38)', fontSize: 11 }}>{v.moment}</Typography></Box><Typography sx={{ color: ORANGE, fontWeight: 700, fontSize: 13, flexShrink: 0, ml: 1 }}>{v.montant}</Typography></Box>))}
             </Box>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <Box sx={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', p: 3, height: '100%', display: 'flex', flexDirection: 'column', transition: 'all 0.32s cubic-bezier(0.4,0,0.2,1)', cursor: 'default', '&:hover': { background: 'rgba(255,255,255,0.11)', border: '1px solid rgba(255,127,39,0.5)', transform: 'translateY(-8px)', boxShadow: '0 24px 48px rgba(0,0,0,0.25)' } }}>
+          <Grid item xs={12} md={4} sx={{ display: 'flex' }}>
+            <Box sx={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', p: 3, width: '100%', display: 'flex', flexDirection: 'column', transition: 'all 0.32s cubic-bezier(0.4,0,0.2,1)', cursor: 'default', '&:hover': { background: 'rgba(255,255,255,0.11)', border: '1px solid rgba(255,127,39,0.5)', transform: 'translateY(-8px)', boxShadow: '0 24px 48px rgba(0,0,0,0.25)' } }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, mb: 2.5 }}><Box sx={{ width: 32, height: 32, borderRadius: '10px', background: `rgba(255,127,39,0.15)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Package size={16} color={ORANGE} /></Box><Typography sx={{ color: ORANGE, fontWeight: 700, fontSize: 12.5, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Infos pratiques</Typography></Box>
               {[{ icon: Utensils, label: 'Cantine scolaire', detail: 'Facultative · 8 000 Frs / mois' }, { icon: Shirt, label: "Tenue de l'école", detail: "Vert / blanc petit carreau — à l'actif des parents" }, { icon: CheckCircle, label: 'Inclus dans la scolarité', detail: 'Goûter + tenue de sport fournis' }, { icon: Bus, label: 'Transport', detail: 'Taximètres disponibles sur demande' }].map(({ icon: Icon, label, detail }) => (
                 <Box key={label} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.25, mb: 2 }}><Box sx={{ width: 28, height: 28, borderRadius: '8px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, mt: 0.2 }}><Icon size={13} color="rgba(255,255,255,0.55)" /></Box><Box><Typography sx={{ color: 'rgba(255,255,255,0.88)', fontSize: 12.5, fontWeight: 600, lineHeight: 1.3 }}>{label}</Typography><Typography sx={{ color: 'rgba(255,255,255,0.4)', fontSize: 11.5, lineHeight: 1.5, mt: 0.2 }}>{detail}</Typography></Box></Box>
