@@ -215,13 +215,6 @@ export function FlashTicker({ params, flashItems = [] }) {
         </div>
       </Box>
 
-      {/* Lien droite fixe */}
-      <Box
-        component={Link}
-        to="/flash-infos"
-        sx={{ flexShrink: 0, display: 'flex', alignItems: 'center', gap: 0.5, px: 2, height: '100%', background: '#0f4a25', borderLeft: '2px solid rgba(255,127,39,0.4)', textDecoration: 'none', '&:hover': { background: '#0a2e18' }, transition: 'background 0.2s', zIndex: 2 }}
-      >
-      </Box>
     </Box>
   )
 }
