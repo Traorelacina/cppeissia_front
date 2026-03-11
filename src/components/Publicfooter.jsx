@@ -160,38 +160,37 @@ export default function PublicFooter() {
             ))}
           </Grid>
 
-          {/* BLOC 4 — SCOLARITÉ */}
-          <Grid item xs={12} md={4}>
-            <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '1.5px', mb: 2 }}>
-              Scolarité {annee}
-            </Typography>
-            <Box
-              sx={{
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(255,255,255,0.07)',
-                borderRadius: '12px',
-                p: 2,
-                fontSize: 13,
-                lineHeight: 2.2,
-              }}
-            >
-              {[
-                ['Montant annuel',  `${montant} FCFA`],
-                ['1er versement',  "À l'inscription"],
-                ['2e versement',   `Fin Novembre ${anneeVersement}`],
-                ['3e versement',   `Fin Décembre ${anneeVersement}`],
-                ['Cantine',        'En option'],
-              ].map(([label, value]) => (
-                <Box
-                  key={label}
-                  sx={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', py: 0.3 }}
-                >
-                  <span style={{ color: 'rgba(255,255,255,0.45)' }}>{label}</span>
-                  <span style={{ color: ORANGE, fontWeight: 600 }}>{value}</span>
-                </Box>
-              ))}
-            </Box>
-          </Grid>
+       {/* BLOC 4 — SCOLARITÉ */}
+<Grid item xs={12} md={4}>
+  <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 12, textTransform: 'uppercase', letterSpacing: '1.5px', mb: 2 }}>
+    Scolarité {annee}
+  </Typography>
+  <Box
+    sx={{
+      background: 'rgba(255,255,255,0.04)',
+      border: '1px solid rgba(255,255,255,0.07)',
+      borderRadius: '12px',
+      p: 2.5,
+      fontSize: 13,
+    }}
+  >
+    {[
+      ['Montant annuel', `${montant} FCFA`],
+      ['1er versement',  "À l'inscription"],
+      ['2e versement',   `Fin Novembre ${anneeVersement}`],
+      ['3e versement',   `Fin Décembre ${anneeVersement}`],
+      ['Cantine',        'En option'],
+    ].map(([label, value]) => (
+      <Box
+        key={label}
+        sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)', py: 2 }}
+      >
+        <span style={{ color: 'rgba(255,255,255,0.45)' }}>{label}</span>
+        <span style={{ color: ORANGE, fontWeight: 600 }}>{value}</span>
+      </Box>
+    ))}
+  </Box>
+</Grid>
 
         </Grid>
       </Container>
@@ -204,12 +203,7 @@ export default function PublicFooter() {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box
-                  component="img"
-                  src={logo}
-                  alt="Logo"
-                  sx={{ width: 24, height: 24, objectFit: 'contain', opacity: 0.5, filter: 'brightness(0) invert(1)' }}
-                />
+                
                 <Typography sx={{ fontSize: 11, color: 'rgba(255,255,255,0.25)' }}>
                   © {new Date().getFullYear()} CPPE ISSIA
                 </Typography>

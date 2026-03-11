@@ -767,6 +767,9 @@ function InscriptionCTA({ params }) {
 // ========================
 // CONTACT RAPIDE
 // ========================
+// ========================
+// CONTACT RAPIDE
+// ========================
 function ContactRapide({ params }) {
   const adresse   = params?.adresse   || "Complexe Socio-Éducatif d'Issia, Haut-Sassandra"
   const telephone = params?.telephone || '07 07 18 65 59 / 05 06 48 22 01'
@@ -778,25 +781,99 @@ function ContactRapide({ params }) {
     { icon: Clock,  title: 'Horaires',  text: horaires,  color: GREEN },
   ]
 
+  const [current, setCurrent] = useState(0)
+  const touchStartX = useRef(null)
+
+  const prev = () => setCurrent(c => (c === 0 ? infos.length - 1 : c - 1))
+  const next = () => setCurrent(c => (c === infos.length - 1 ? 0 : c + 1))
+
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX }
+  const handleTouchEnd   = (e) => {
+    if (touchStartX.current === null) return
+    const diff = touchStartX.current - e.changedTouches[0].clientX
+    if (Math.abs(diff) > 40) diff > 0 ? next() : prev()
+    touchStartX.current = null
+  }
+
+  const CardContent = ({ icon: Icon, title, text, color }) => (
+    <Box sx={{
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      textAlign: 'center', p: 3, width: '100%',
+    }}>
+      <Box sx={{
+        width: 52, height: 52, borderRadius: '14px',
+        background: `${color}18`, display: 'flex',
+        alignItems: 'center', justifyContent: 'center', mb: 1.5,
+      }}>
+        <Icon size={22} color={color} />
+      </Box>
+      <Typography sx={{ fontWeight: 700, fontSize: 13, color: '#0c1a10', mb: 0.5 }}>{title}</Typography>
+      <Typography sx={{ fontSize: 13, color: '#6b7c70', lineHeight: 1.6 }}>{text}</Typography>
+    </Box>
+  )
+
   return (
     <Box sx={{ py: 6, background: '#fff' }}>
       <Container maxWidth="md">
-        <Grid container spacing={2}>
+
+        {/* VERSION DESKTOP — grille normale */}
+        <Grid container spacing={2} sx={{ display: { xs: 'none', md: 'flex' } }}>
           {infos.map(({ icon: Icon, title, text, color }) => (
-            <Grid item xs={12} md={4} key={title}>
-              <Box sx={{ textAlign: 'center', p: 3 }}>
-                <Box sx={{ width: 52, height: 52, borderRadius: '14px', background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', mx: 'auto', mb: 1.5 }}><Icon size={22} color={color} /></Box>
-                <Typography sx={{ fontWeight: 700, fontSize: 13, color: '#0c1a10', mb: 0.5 }}>{title}</Typography>
-                <Typography sx={{ fontSize: 13, color: '#6b7c70', lineHeight: 1.6 }}>{text}</Typography>
-              </Box>
+            <Grid item md={4} key={title} sx={{ display: 'flex', justifyContent: 'center' }}>
+              <CardContent icon={Icon} title={title} text={text} color={color} />
             </Grid>
           ))}
         </Grid>
+
+        {/* VERSION MOBILE — carousel */}
+        <Box sx={{ display: { xs: 'block', md: 'none' } }}>
+          <Box
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            sx={{ overflow: 'hidden' }}
+          >
+            <Box sx={{
+              display: 'flex',
+              transform: `translateX(${-current * 100}%)`,
+              transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)',
+            }}>
+              {infos.map(({ icon: Icon, title, text, color }) => (
+                <Box key={title} sx={{ flex: '0 0 100%', width: '100%' }}>
+                  <CardContent icon={Icon} title={title} text={text} color={color} />
+                </Box>
+              ))}
+            </Box>
+          </Box>
+
+          {/* Dots + flèches */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, mt: 1 }}>
+            <IconButton onClick={prev} size="small"
+              sx={{ width: 32, height: 32, border: `1.5px solid rgba(27,122,62,0.3)`, color: GREEN }}>
+              <ChevronLeft size={16} />
+            </IconButton>
+
+            <Box sx={{ display: 'flex', gap: 0.75 }}>
+              {infos.map((_, i) => (
+                <Box key={i} onClick={() => setCurrent(i)} sx={{
+                  width: i === current ? 20 : 7, height: 7,
+                  borderRadius: '6px', cursor: 'pointer',
+                  background: i === current ? GREEN : 'rgba(27,122,62,0.2)',
+                  transition: 'all 0.3s ease',
+                }} />
+              ))}
+            </Box>
+
+            <IconButton onClick={next} size="small"
+              sx={{ width: 32, height: 32, border: `1.5px solid rgba(27,122,62,0.3)`, color: GREEN }}>
+              <ChevronRight size={16} />
+            </IconButton>
+          </Box>
+        </Box>
+
       </Container>
     </Box>
   )
 }
-
 // ========================
 // MAIN HOME PAGE
 // ========================
