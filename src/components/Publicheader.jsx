@@ -32,12 +32,9 @@ import { useQuery } from "@tanstack/react-query";
 import { parametresApi } from '@/api/services'
 import logo from '../assets/logo.jpeg'
 
-// COULEUR ORANGE DU MINISTÈRE
 const ORANGE     = '#FF7F27'
-// Fond crème orangé (Petite Section)
 const BG_CREAM   = '#fff8ee'
 const BG_BORDER  = '#ffe082'
-// Texte sombre sur fond clair
 const TEXT_DARK  = '#5a3a00'
 const TEXT_MID   = '#9a6a20'
 const TEXT_MUTED = 'rgba(90,58,0,0.48)'
@@ -132,10 +129,10 @@ export default function PublicHeader() {
 
             {!isMobile && (
               <Box sx={{ lineHeight: 1.2 }}>
-                <Box sx={{ fontSize: '13px', fontWeight: 800, color: TEXT_DARK, letterSpacing: '0.2px' }}>
+                <Box sx={{ fontSize: '14px', fontWeight: 800, color: TEXT_DARK, letterSpacing: '0.2px' }}>
                   CPPE d'Issia
                 </Box>
-                <Box sx={{ fontSize: '9.5px', color: TEXT_MUTED, letterSpacing: '1px', textTransform: 'uppercase', mt: '1px' }}>
+                <Box sx={{ fontSize: '10px', color: TEXT_MUTED, letterSpacing: '1px', textTransform: 'uppercase', mt: '1px' }}>
                   Complexe Socio-Éducatif
                 </Box>
               </Box>
@@ -158,7 +155,7 @@ export default function PublicHeader() {
                     <Button
                       endIcon={
                         <ChevronDown
-                          size={13}
+                          size={14}
                           style={{
                             transition: 'transform 0.2s',
                             transform: dropdownOpen ? 'rotate(180deg)' : 'none',
@@ -167,7 +164,7 @@ export default function PublicHeader() {
                       }
                       sx={{
                         color: dropdownOpen ? ORANGE : TEXT_DARK,
-                        fontSize: '12.5px',
+                        fontSize: '14px',       // ↑ était 12.5px
                         fontWeight: 700,
                         px: 1.75,
                         borderRadius: 0,
@@ -188,7 +185,7 @@ export default function PublicHeader() {
                           background: '#fff8ee',
                           borderRadius: '0 0 14px 14px',
                           overflow: 'hidden',
-                          minWidth: 195,
+                          minWidth: 200,
                           boxShadow: '0 16px 40px rgba(180,100,0,0.18)',
                           zIndex: 1000,
                           border: `1px solid ${BG_BORDER}`,
@@ -201,9 +198,9 @@ export default function PublicHeader() {
                             to={child.href}
                             style={({ isActive }) => ({
                               display: 'block',
-                              padding: '11px 18px',
+                              padding: '12px 18px',
                               color: isActive ? ORANGE : TEXT_DARK,
-                              fontSize: '12.5px',
+                              fontSize: '14px',   // ↑ était 12.5px
                               fontWeight: isActive ? 700 : 500,
                               textDecoration: 'none',
                               borderLeft: isActive ? `3px solid ${ORANGE}` : '3px solid transparent',
@@ -228,7 +225,7 @@ export default function PublicHeader() {
                       alignItems: 'center',
                       padding: '0 13px',
                       color: isActive ? ORANGE : TEXT_DARK,
-                      fontSize: '12.5px',
+                      fontSize: '14px',           // ↑ était 12.5px
                       fontWeight: 700,
                       textDecoration: 'none',
                       borderBottom: isActive ? `2px solid ${ORANGE}` : '2px solid transparent',
@@ -251,12 +248,12 @@ export default function PublicHeader() {
                 to="/espace-parent"
                 variant="contained"
                 size="small"
-                startIcon={<User size={14} />}
+                startIcon={<User size={15} />}
                 sx={{
                   background: ORANGE,
                   color: '#fff',
                   fontWeight: 800,
-                  fontSize: '12px',
+                  fontSize: '13px',             // ↑ était 12px
                   px: 2.25,
                   py: 0.9,
                   borderRadius: '30px',
@@ -298,7 +295,7 @@ export default function PublicHeader() {
         open={mobileOpen}
         onClose={() => setMobileOpen(false)}
         PaperProps={{
-          sx: { width: 285, background: '#fff8ee', color: TEXT_DARK, pt: 1 },
+          sx: { width: 290, background: '#fff8ee', color: TEXT_DARK, pt: 1 },
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 2, pb: 2, borderBottom: `1px solid ${BG_BORDER}` }}>
@@ -314,8 +311,8 @@ export default function PublicHeader() {
               <Box component="img" src={logo} alt="Logo CPPE Issia" sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             </Box>
             <Box>
-              <Box sx={{ fontSize: '12.5px', fontWeight: 800, color: TEXT_DARK }}>CPPE d'Issia</Box>
-              <Box sx={{ fontSize: '9px', color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.8px' }}>Complexe Socio-Éducatif</Box>
+              <Box sx={{ fontSize: '13.5px', fontWeight: 800, color: TEXT_DARK }}>CPPE d'Issia</Box>
+              <Box sx={{ fontSize: '10px', color: TEXT_MUTED, textTransform: 'uppercase', letterSpacing: '0.8px' }}>Complexe Socio-Éducatif</Box>
             </Box>
           </Box>
           <IconButton onClick={() => setMobileOpen(false)} sx={{ color: TEXT_MID, p: 0.75 }}>
@@ -332,14 +329,14 @@ export default function PublicHeader() {
                 <ListItem
                   button
                   onClick={() => setSectionsOpen(!sectionsOpen)}
-                  sx={{ color: TEXT_DARK, py: 1.1, px: 2 }}
+                  sx={{ color: TEXT_DARK, py: 1.3, px: 2 }}
                 >
                   <ListItemText
                     primary={item.label}
-                    primaryTypographyProps={{ fontSize: 13, fontWeight: 700, color: TEXT_DARK }}
+                    primaryTypographyProps={{ fontSize: 15, fontWeight: 700, color: TEXT_DARK }}  // ↑ était 13
                   />
                   <ChevronDown
-                    size={15}
+                    size={16}
                     style={{ transform: sectionsOpen ? 'rotate(180deg)' : 'none', transition: '0.2s', color: TEXT_MID }}
                   />
                 </ListItem>
@@ -350,9 +347,12 @@ export default function PublicHeader() {
                       component={Link}
                       to={child.href}
                       onClick={() => setMobileOpen(false)}
-                      sx={{ pl: 4, color: TEXT_MID, py: 0.85, borderLeft: `2px solid ${BG_BORDER}`, ml: 2 }}
+                      sx={{ pl: 4, color: TEXT_MID, py: 1, borderLeft: `2px solid ${BG_BORDER}`, ml: 2 }}
                     >
-                      <ListItemText primary={child.label} primaryTypographyProps={{ fontSize: 12.5, color: TEXT_MID }} />
+                      <ListItemText
+                        primary={child.label}
+                        primaryTypographyProps={{ fontSize: 14, color: TEXT_MID }}  // ↑ était 12.5
+                      />
                     </ListItem>
                   ))}
                 </Collapse>
@@ -367,11 +367,14 @@ export default function PublicHeader() {
                   color: location.pathname === item.href ? ORANGE : TEXT_DARK,
                   borderLeft: location.pathname === item.href ? `3px solid ${ORANGE}` : '3px solid transparent',
                   background: location.pathname === item.href ? `rgba(255,127,39,0.07)` : 'transparent',
-                  py: 1.1,
+                  py: 1.3,
                   transition: 'all 0.15s',
                 }}
               >
-                <ListItemText primary={item.label} primaryTypographyProps={{ fontSize: 13, fontWeight: 700, color: 'inherit' }} />
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{ fontSize: 15, fontWeight: 700, color: 'inherit' }}  // ↑ était 13
+                />
               </ListItem>
             )
           })}
@@ -389,7 +392,7 @@ export default function PublicHeader() {
               background: ORANGE,
               color: '#fff',
               fontWeight: 800,
-              fontSize: '13px',
+              fontSize: '14px',               // ↑ était 13px
               py: 1.25,
               borderRadius: '30px',
               '&:hover': { background: '#e66e00' },
